@@ -28,7 +28,7 @@ def NexusUpload(){
                                         type: "${pomPackaging}"]], 
                             credentialsId: 'nexus-admin-user', 
                             groupId: "${pomGroupId}", 
-                            nexusUrl: '192.168.1.200:30083', 
+                            nexusUrl: '192.168.1.200:8081/nexus', 
                             nexusVersion: 'nexus3', 
                             protocol: 'http', 
                             repository: "${repoName}", 
@@ -43,8 +43,8 @@ def MavenUpload(){
         ${mvnHome}/bin/mvn deploy:deploy-file -Dmaven.test.skip=true  \
                                 -Dfile=${jarName} -DgroupId=${pomGroupId} \
                                 -DartifactId=${pomArtifact} -Dversion=${pomVersion}  \
-                                -Dpackaging=${pomPackaging} -DrepositoryId=maven-hostd \
-                                -Durl=http://192.168.1.200:30083/repository/maven-hostd 
+                                -Dpackaging=${pomPackaging} -DrepositoryId=maven-releases \
+                                -Durl=http://192.168.1.200:8081/nexus/repository/maven-releases 
         """
 }
 
@@ -60,7 +60,7 @@ def ArtifactUpdate(updateType,artifactUrl){
 
         //获取artifactID 
         
-        artifactUrl = artifactUrl -  "http://192.168.1.200:30083/repository/maven-hostd/"
+        artifactUrl = artifactUrl -  "http://192.168.1.200:8081/nexus/repository/maven-releases/"
         artifactUrl = artifactUrl.split("/").toList()
         
         println(artifactUrl.size())
