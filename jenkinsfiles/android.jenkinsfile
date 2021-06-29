@@ -147,7 +147,7 @@ pipeline{
                     result = readJSON text: """${android.UploadPgyer("${serviceName}.apk")}"""
                     
                     imageUrl = result["data"]["appQRCodeURL"]
-                    currentBuild.description = "<img src=${imageUrl}>"
+                    currentBuild.description = "<img src=${imageUrl}"
     
                 }
             }
