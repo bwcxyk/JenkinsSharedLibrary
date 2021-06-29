@@ -142,13 +142,11 @@ pipeline{
                     android.UploadFir("android","1.1",serviceName,"1.1.1","${serviceName}.apk")
                     
                     tools.PrintMes("发布应用---Pgyer","green")
+                    //android.UploadPgyer("${serviceName}.apk")
                     result = readJSON text: """${android.UploadPgyer("${serviceName}.apk")}"""
                     
                     imageUrl = result["data"]["appQRCodeURL"]
                     currentBuild.description = "<img src=${imageUrl}"
-                
-                   
-                    
     
                 }
             }
