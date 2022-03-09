@@ -1,6 +1,10 @@
 #!/bin/bash
 #食用方法 sh push_1of2.sh ${REGISTRY_URL} ${TAG_VERSION}
 
+if [ "$2" != "" ];
+    then
+    TAG_VERSION="$2"
+fi
 
 # build_push_tag
 push_tag()
