@@ -1,11 +1,11 @@
 #!/bin/bash
-#食用方法 sh push2.sh ${repo} ${tag}
+#食用方法 sh push_1of2.sh ${REGISTRY_URL} ${TAG_VERSION}
 
 
 # build_push_tag
 push_tag()
 {
-    sh $WORKSPACE/push.sh ${REGISTRY_URL}
+    sh $WORKSPACE/push.sh ${REGISTRY_URL} ${TAG_VERSION}
 }
 
 if [ "$1" = "local" ];
