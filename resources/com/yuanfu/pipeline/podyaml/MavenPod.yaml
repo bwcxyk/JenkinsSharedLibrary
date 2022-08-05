@@ -1,0 +1,37 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jnlp
+  namespace: jenkins
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:latest-jdk11
+    imagePullPolicy: IfNotPresent
+  - name: maven
+    image: yaokun/maven:3.6.2-jdk8
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /usr/local/maven/repository
+      name: jenkins-maven
+    command:
+    - cat
+    tty: true
+  - name: docker
+    image: yaokun/docker:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: dockersock
+    command:
+    - cat
+    tty: true
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: jenkins-maven
+      persistentVolumeClaim:
+        claimName: jenkins-maven

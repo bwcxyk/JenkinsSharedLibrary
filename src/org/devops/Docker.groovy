@@ -38,7 +38,7 @@ def  build() {
             echo "构建成功发送错误!"
         }
         //new一个Ding对象
-        new Ding().message(env.BUILD_TASKS, "${stage} success...   √")
+       // new Ding().message(env.BUILD_TASKS, "${stage} success...   √")
         echo "docker build success"
     } else {
         //通知gitlab构建失败
@@ -47,7 +47,7 @@ def  build() {
         }catch(Exception e){
             echo "构建失败发送错误!"
         }
-        new Ding().message(env.BUILD_TASKS, "${stage} Failed...  x")
+       // new Ding().message(env.BUILD_TASKS, "${stage} Failed...  x")
         echo "docker build error:" + $ { msg }
     }
     return this

@@ -10,7 +10,7 @@ def CheckOut(){
         branches: scm.branches,
         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
         // extensions: [[$class: 'CloneOption', shallow: true, noTags: false, reference: '', timeout: null, depth: 1, honorRefspec: false]],
-        extensions: [[$class: 'CloneOption', depth: 1]],
+        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]],
         userRemoteConfigs: scm.userRemoteConfigs
     ])
 }
