@@ -11,7 +11,7 @@ spec:
     image: jenkins/inbound-agent:latest-jdk11
     imagePullPolicy: IfNotPresent
   - name: node
-    image: yaokun/node:12.13.1-alpine
+    image: yaokun/node:12.13.1
     imagePullPolicy: IfNotPresent
     command:
     - cat
