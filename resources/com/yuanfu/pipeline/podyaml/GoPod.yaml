@@ -11,7 +11,7 @@ spec:
     image: jenkins/inbound-agent:latest-jdk11
     imagePullPolicy: IfNotPresent
   - name: go
-    image: yaokun/go:1.17
+    image: yaokun/golang:1.17
     imagePullPolicy: IfNotPresent
     command:
     - cat
