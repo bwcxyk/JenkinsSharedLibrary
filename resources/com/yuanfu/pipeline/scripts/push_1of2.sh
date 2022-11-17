@@ -9,7 +9,7 @@ fi
 # build_push_tag
 push_tag()
 {
-    sh $WORKSPACE/push.sh ${REGISTRY_URL} ${TAG_VERSION}
+    sh $WORKSPACE/push_2of2.sh ${REGISTRY_URL} ${TAG_VERSION}
 }
 
 if [ "$1" = "local" ];
