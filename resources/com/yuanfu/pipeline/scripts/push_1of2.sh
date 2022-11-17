@@ -15,19 +15,24 @@ push_tag()
 if [ "$1" = "local" ];
     then
     # login
-    REGISTRY_URL="192.168.0.2"
-    docker login --username=admin ${REGISTRY_URL} --password=Yuanfu1211
+    USERNAME=""
+    PASSWORD=""
+    REGISTRY_URL=""
+    echo "${PASSWORD}" | docker login --username=${USERNAME} ${REGISTRY_URL} --password-stdin
     push_tag
     elif [ "$1" = "aliyun" ];
     then
+    USERNAME=""
+    PASSWORD=""
     REGISTRY_URL="registry.cn-shanghai.aliyuncs.com"
-    docker login --username=远孚集团 ${REGISTRY_URL} --password=wzygymtijus9
+    echo "${PASSWORD}" | docker login --username=${USERNAME} ${REGISTRY_URL} --password-stdin
     push_tag
     elif [ "$1" = "huaweicloud" ];
     then
+    USERNAME=""
+    PASSWORD=""
     REGISTRY_URL="swr.cn-east-2.myhuaweicloud.com"
-    docker login --username=cn-east-2@VMKGNWR86FUNMDMKNPKJ --password=eefd5bebe0e349a5ed2ffb22bf0a488ec8dba5d2a3075272f8f0d79e0f09616e ${REGISTRY_URL}
-    #docker login -u cn-east-2@VMKGNWR86FUNMDMKNPKJ -p eefd5bebe0e349a5ed2ffb22bf0a488ec8dba5d2a3075272f8f0d79e0f09616e ${REGISTRY_URL}
+    echo "${PASSWORD}" | docker login --username=${USERNAME} ${REGISTRY_URL} --password-stdin
     push_tag
     else
     echo '本地仓库:push.sh local 1.0'
