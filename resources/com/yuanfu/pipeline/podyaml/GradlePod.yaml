@@ -1,0 +1,40 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jnlp
+  namespace: jenkins
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:latest-jdk11
+    imagePullPolicy: IfNotPresent
+  - name: gradle
+    image: gradle:4.10.3-jdk8
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /home/gradle/.gradle/caches/modules-2/files-2.1
+      name: jenkins-maven
+    command:
+    - cat
+    tty: true
+  - name: docker
+    image: docker:latest
+    imagePullPolicy: IfNotPresent
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: dockersock
+    command:
+    - cat
+    tty: true
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: jenkins-maven
+      persistentVolumeClaim:
+        claimName: jenkins-maven
