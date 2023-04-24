@@ -11,7 +11,7 @@ spec:
     image: jenkins/inbound-agent:latest-jdk11
     imagePullPolicy: IfNotPresent
   - name: maven
-    image: yaokun/maven:3.6.2-jdk8
+    image: maven:3.6.2-jdk-8
     imagePullPolicy: IfNotPresent
     volumeMounts:
     - mountPath: /usr/local/maven/repository
@@ -20,8 +20,11 @@ spec:
     - cat
     tty: true
   - name: docker
-    image: yaokun/docker:latest
+    image: docker:latest
     imagePullPolicy: IfNotPresent
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock

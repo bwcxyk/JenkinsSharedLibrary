@@ -11,14 +11,17 @@ spec:
     image: jenkins/inbound-agent:latest-jdk11
     imagePullPolicy: IfNotPresent
   - name: node
-    image: yaokun/node:12.13.1
+    image: node:12.13.1
     imagePullPolicy: IfNotPresent
     command:
     - cat
     tty: true
   - name: docker
-    image: yaokun/docker:latest
+    image: docker:latest
     imagePullPolicy: IfNotPresent
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock

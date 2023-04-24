@@ -18,7 +18,7 @@ spec:
         cpu: 100m
         memory: 500Mi
   - name: go
-    image: yaokun/golang:1.17
+    image: golang:1.17
     imagePullPolicy: IfNotPresent
     env:
       - name: GOPROXY
@@ -34,8 +34,11 @@ spec:
         cpu: 300m
         memory: 1000Mi
   - name: docker
-    image: yaokun/docker:latest
+    image: docker:latest
     imagePullPolicy: IfNotPresent
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock
