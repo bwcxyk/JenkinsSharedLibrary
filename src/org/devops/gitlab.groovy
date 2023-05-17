@@ -2,7 +2,9 @@ package org.devops
 
 //封装HTTP请求
 def HttpReq(reqType,reqUrl,reqBody){
-    def gitServer = "http://192.168.1.200:30088/api/v4"
+    // Gitlab Api地址
+    def gitServer = "http://192.168.1.83/api/v4"
+    // gitlab上创建一个凭据,注意是"文本凭据",存在jenkins上,凭据ID:gitlab-token,赋值给gitlabToken变量
     withCredentials([string(credentialsId: 'gitlab-token', variable: 'gitlabToken')]) {
       result = httpRequest customHeaders: [[maskValue: true, name: 'PRIVATE-TOKEN', value: "${gitlabToken}"]], 
                 httpMode: reqType, 
