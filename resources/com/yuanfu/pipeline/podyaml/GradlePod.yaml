@@ -9,10 +9,17 @@ spec:
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk11
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
   - name: gradle
     image: gradle:4.10.3-jdk8
-    imagePullPolicy: IfNotPresent
+    resources: # 资源配额
+      limits:  # 限制资源（上限）
+        cpu: 2000m # CPU限制
+        memory: 3000Mi # 内存限制
+      requests: # 请求资源（下限）
+        cpu: 1500m  # CPU预留
+        memory: 2500Mi  # 内存预留
+    imagePullPolicy: Always
     volumeMounts:
     - mountPath: /home/gradle/.gradle/caches/modules-2/files-2.1
       name: jenkins-maven
@@ -21,7 +28,7 @@ spec:
     tty: true
   - name: docker
     image: docker:latest
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
     env:
       - name: DOCKER_BUILDKIT
         value: 0

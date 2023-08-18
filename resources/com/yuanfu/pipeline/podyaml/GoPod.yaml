@@ -10,13 +10,6 @@ spec:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk11
     imagePullPolicy: IfNotPresent
-    resources:
-      limits:
-        cpu: 300m
-        memory: 1000Mi
-      requests:
-        cpu: 100m
-        memory: 500Mi
   - name: go
     image: golang:1.17
     imagePullPolicy: IfNotPresent
@@ -26,13 +19,6 @@ spec:
     command:
     - cat
     tty: true
-    resources:
-      limits:
-        cpu: 500m
-        memory: 2000Mi
-      requests:
-        cpu: 300m
-        memory: 1000Mi
   - name: docker
     image: docker:latest
     imagePullPolicy: IfNotPresent
@@ -45,13 +31,6 @@ spec:
     command:
     - cat
     tty: true
-    resources:
-      limits:
-        cpu: 300m
-        memory: 1000Mi
-      requests:
-        cpu: 100m
-        memory: 500Mi
   volumes:
     - name: dockersock
       hostPath:

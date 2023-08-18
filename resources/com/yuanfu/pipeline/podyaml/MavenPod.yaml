@@ -9,10 +9,10 @@ spec:
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk11
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
   - name: maven
-    image: maven:3.6.2-jdk-8
-    imagePullPolicy: IfNotPresent
+    image: maven:3.8.6-jdk-8-slim
+    imagePullPolicy: Always
     volumeMounts:
     - mountPath: /usr/local/maven/repository
       name: jenkins-maven
@@ -21,7 +21,7 @@ spec:
     tty: true
   - name: docker
     image: docker:latest
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
     env:
       - name: DOCKER_BUILDKIT
         value: 0
