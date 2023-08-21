@@ -9,26 +9,29 @@ spec:
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk11
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
   - name: node
     image: yaokun/node:14.19.3
+    env:
+      - name: NODE_OPTIONS
+        value: '--max-old-space-size=3072'
     resources: # 资源配额
       limits:  # 限制资源（上限）
-        cpu: 1500m # CPU限制
-        memory: 3000Mi # 内存限制
+        cpu: 2500m # CPU限制
+        memory: 4500Mi # 内存限制
       requests: # 请求资源（下限）
-        cpu: 1000m  # CPU预留
-        memory: 2500Mi  # 内存预留
+        cpu: 2000m  # CPU预留
+        memory: 4000Mi  # 内存预留
     imagePullPolicy: Always
     command:
     - cat
     tty: true
   - name: docker
     image: docker:latest
-    imagePullPolicy: Always
     env:
       - name: DOCKER_BUILDKIT
         value: 0
+    imagePullPolicy: IfNotPresent
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock
