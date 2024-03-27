@@ -136,7 +136,7 @@ under the License.
      <mirror>
         <id>localmirror</id>
         <name>local mirror</name>
-        <url>http://192.168.1.200:8081/nexus/repository/maven-public/</url>
+        <url>http://192.168.1.200:8081/repository/maven-public/</url>
         <mirrorOf>central</mirrorOf>
     </mirror>
 </mirrors>
@@ -167,10 +167,10 @@ under the License.
     <id>rdc</id>
     <properties>
       <altReleaseDeploymentRepository>
-        rdc-releases::default::http://192.168.1.200:8081/nexus/repository/maven-releases/
+        rdc-releases::default::http://192.168.1.200:8081/repository/maven-releases/
       </altReleaseDeploymentRepository>
       <altSnapshotDeploymentRepository>
-        rdc-snapshots::default::http://192.168.1.200:8081/nexus/repository/maven-snapshots/
+        rdc-snapshots::default::http://192.168.1.200:8081/repository/maven-snapshots/
       </altSnapshotDeploymentRepository>
     </properties>
   </profile>

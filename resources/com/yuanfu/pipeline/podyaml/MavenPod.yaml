@@ -8,11 +8,18 @@ spec:
     runAsUser: 0
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:latest-jdk11
-    imagePullPolicy: Always
+    image: jenkins/inbound-agent:latest-jdk17
+    imagePullPolicy: IfNotPresent
   - name: maven
     image: maven:3.8.6-jdk-8-slim
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 2500m
+        memory: 4000Mi
+      requests:
+        cpu: 1000m
+        memory: 2000Mi
     volumeMounts:
     - mountPath: /usr/local/maven/repository
       name: jenkins-maven
@@ -21,7 +28,7 @@ spec:
     tty: true
   - name: docker
     image: docker:latest
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     env:
       - name: DOCKER_BUILDKIT
         value: 0
