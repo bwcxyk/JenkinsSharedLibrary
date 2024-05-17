@@ -4,7 +4,7 @@ def call(){
   checkout scm
 }
 
-def checkoutWithDepth {
+def checkoutWithDepth(){
     checkout([
         $class: 'GitSCM',
         branches: scm.branches,
