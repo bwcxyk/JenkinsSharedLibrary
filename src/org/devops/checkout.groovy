@@ -9,7 +9,12 @@ def checkoutWithDepth(){
         $class: 'GitSCM',
         branches: scm.branches,
         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-        extensions: [[$class: 'CloneOption', depth: 1, noTags: false]],
+        extensions: [
+            // 设置 clone 参数
+            [$class: 'CloneOption', depth: 1, noTags: false],
+            // 添加 GitLFSPull 插件
+            [$class: 'GitLFSPull']
+        ],
         userRemoteConfigs: scm.userRemoteConfigs
     ])
 }
