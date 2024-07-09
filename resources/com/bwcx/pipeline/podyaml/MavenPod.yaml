@@ -39,7 +39,7 @@ spec:
       name: dockersock
     tty: true
   - name: kaniko
-    image: 192.168.1.60/library/kaniko-executor:debug
+    image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: IfNotPresent
     command:
     - cat
@@ -47,7 +47,7 @@ spec:
       - name: KANIKO_REGISTRY_MAP
         value: index.docker.io=dockerproxy.com;index.docker.io=docker.mirrors.ustc.edu.cn;index.docker.io=docker.nju.edu.cn
     volumeMounts:
-    - name: registry-secret
+    - name: kaniko-secret
       mountPath: /kaniko/.docker
     tty: true
   volumes:
@@ -57,9 +57,9 @@ spec:
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
-    - name: registry-secret
+    - name: kaniko-secret
       secret:
         secretName: registry-secret
         items:
-          - key: config.json
+          - key: .dockerconfigjson
             path: config.json
