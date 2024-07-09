@@ -43,6 +43,9 @@ spec:
     imagePullPolicy: IfNotPresent
     command:
     - cat
+    env:
+      - name: KANIKO_REGISTRY_MAP
+        value: index.docker.io=dockerproxy.com;index.docker.io=docker.mirrors.ustc.edu.cn;index.docker.io=docker.nju.edu.cn
     volumeMounts:
     - name: registry-secret
       mountPath: /kaniko/.docker
