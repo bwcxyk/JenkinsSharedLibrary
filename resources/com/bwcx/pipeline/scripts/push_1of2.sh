@@ -1,22 +1,31 @@
 #!/bin/bash
-#食用方法 sh push_1of2.sh ${REGISTRY_URL} ${TAG_VERSION}
+# 使用方法 sh push_1of2.sh "$registry" "$TAG_VERSION"
 
+# 设置默认的TAG_VERSION为当前日期时间
+DATE=$(date +"%Y%m%d%H%M%S")
+TAG_VERSION=${DATE} #镜像的版本
+
+# 如果提供了第二个参数，则使用该参数作为TAG_VERSION
 if [ "$2" != "" ];
     then
     TAG_VERSION="$2"
 fi
 
+set -e
+
 # build_push_tag
 push_tag()
 {
-    sh $WORKSPACE/push_2of2.sh ${REGISTRY_URL} ${TAG_VERSION}
+    sh $WORKSPACE/push.sh ${REGISTRY_URL} ${TAG_VERSION}
+    echo -e "\e[1;34mBuild finished!\e[0m"
+    echo -e "\e[1;32mDocker image tag: ${TAG_VERSION}\e[0m"
 }
 
 if [ "$1" = "local" ] || [ -z "$1" ]; then
     # login
     USERNAME=""
     PASSWORD=""
-    REGISTRY_URL=""
+    REGISTRY_URL="192.168.1.60"
     echo "${PASSWORD}" | docker login --username=${USERNAME} ${REGISTRY_URL} --password-stdin
     push_tag
 elif [ "$1" = "aliyun" ]; then
