@@ -2,14 +2,14 @@
 @Library('jenkinslibrary@master') _
 
 pipeline {
-    agent none
+    agent any
     stage ('Example') {
         steps {
-             script {
-                 // log是文件名 info是文件中定义的方法
-                 log.info 'Starting'
-                 log.warning 'Nothing to do!'
-             }
+            script {
+                // log是文件名 info是文件中定义的方法
+                log.info 'Starting'
+                log.warning 'Nothing to do!'
+            }
         }
     }
 }

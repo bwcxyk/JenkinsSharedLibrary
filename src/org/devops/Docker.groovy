@@ -1,3 +1,30 @@
+/**
+@Library('jenkinslibrary@master') _
+
+pipeline {
+    agent any
+
+    environment {
+        repo = "public"
+    }
+
+    parameters {
+    choice choices: ['local', 'aliyun', 'huaweicloud'], description: '镜像仓库', name: 'registry'
+    }
+    stages{
+        stage ('Example') {
+            steps {
+                script {
+                    docker.docker("demo")
+                    docker.build()
+                    docker.push()
+                }
+            }
+        }
+    }
+}
+**/
+
 def docker(String project) {
     def registryMap = [
         'local'        : "192.168.1.60",

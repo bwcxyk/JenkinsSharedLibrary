@@ -1,3 +1,20 @@
+/**
+@Library('jenkinslibrary@master') _
+
+pipeline {
+    agent any
+    stages {
+        stage ('Example') {
+            steps {
+                script {
+                    maven.build()
+                }
+            }
+        }
+    }
+}
+**/
+
 package org.devops
 
 def readSettingsXml() {
