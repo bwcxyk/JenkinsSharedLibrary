@@ -25,7 +25,16 @@ pipeline {
 }
 **/
 
-def docker(String project) {
+def docker() {
+
+    // 检查registry和env.repo是否已经设置
+    if (!registry) {
+        error "Registry is not set. Please define the 'registry' parameter."
+    }
+    if (!env.repo) {
+        error "Repository is not set. Please define the 'env.repo' environment variable."
+    }
+
     def registryMap = [
         'local'        : "192.168.1.60",
         'aliyun'       : "registry.cn-shanghai.aliyuncs.com",
@@ -40,17 +49,27 @@ def docker(String project) {
     }
 
     tag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
-    image = "${registryUrl}/${env.repo}/${project}:${tag}"
     islogin = false
     return this
 }
 
-def build() {
+def build(String directory = null, String project) {
+    image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
     Boolean isdockerbuild = false
-    
+
     try {
-        sh "docker build -t ${image} ."
+        if (directory) {
+            // 如果传入了目录参数，则切换到该目录并构建
+            sh """
+                cd ${directory}
+                docker build -t ${image} .
+            """
+        } else {
+            // 如果没有传入目录参数，则在当前目录执行构建
+            sh "docker build -t ${image} ."
+        }
+
         isdockerbuild = true
         env.CURRENT_IMAGE = image
     } catch (Exception e) {
@@ -72,14 +91,14 @@ def push() {
             sh "docker push ${image}"
             
             // 如果push成功，则设置构建描述
-            currentBuild.description = "docker tag: ${image}"
+            currentBuild.description = "docker tag: ${tag}"
             echo "Image pushed successfully and build description set."
         } catch (Exception e) {
             // 如果push失败，则打印错误信息
-            echo "Failed to push image: ${e.message}"
+            error "Failed to push image: ${e.message}"
         }
     } else {
-        echo "Login failed, cannot push image."
+        error "Login failed, cannot push image."
     }
 }
 
