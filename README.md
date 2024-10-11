@@ -1,17 +1,12 @@
 # JenkinsLibrary
 
-## 简介
-
-本共享库是《DevOps流水线最佳实践》教程产出，涵盖基本的构建、部署、发布工具集成。
-
 ## 使用说明
 #### 配置共享库
 - 系统管理 -> 系统设置 -> Global Pipeline Libraries 
-- Source Code Management -> git -> 仓库地址 -> 认证凭据
 
 #### 替换信息
-- 凭据 -> [gitlab/nexus/artifactory/jira]
-- 服务器地址 -> [gitlab/nexus/artifactory/jira]
+- Maven配置 -> [resources/config/settings.xml]
+- Docker仓库 -> [src/org/devops/docker.groovy]
   
 
 ## 目录结构
