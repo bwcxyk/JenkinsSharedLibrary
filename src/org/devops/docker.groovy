@@ -113,7 +113,8 @@ def login() {
                                        usernameVariable: 'USERNAME', 
                                        passwordVariable: 'PASSWORD')]) {
         try {
-            sh "docker login -u ${USERNAME} -p ${PASSWORD} ${registryUrl}"
+            // 安全性：使用 \ 转义 $ 符号可以防止 Groovy 立即展开变量，而是让 shell 在执行命令时再进行变量替换
+            sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin ${registryUrl}"
             echo "Docker login successful."
             islogin = true
         } catch (Exception e) {
