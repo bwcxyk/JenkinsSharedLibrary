@@ -1,92 +1,79 @@
-//docker对象
-def docker(String repo, String tag, String credentialsId, String Dockerfile = "Dockerfile", String path = ".") {
-    this.image = repo + ":" + tag
-    this.repo = tag
-    this.Dockerfile = Dockerfile
-    this.path = path
-    this.credentialsId = credentialsId
-    this.islogin = false
-    return this
-}
+def docker(String project) {
+    def registryMap = [
+        'local'        : "192.168.1.60",
+        'aliyun'       : "registry.cn-shanghai.aliyuncs.com",
+        'huaweicloud'  : "swr.cn-east-2.myhuaweicloud.com"
+    ]
 
-//构建镜像
-def  build() {
-        msg = ""
-        Boolean isdockerbuild = false
-        //构建信息
-        stage = env.STAGE_NAME + '-build'
-
-        retry(3) {
-            try {
-                sh "docker build -t ${this.image} -f ${this.Dockerfile} ${this.path}"
-                isdockerbuild = true
-                env.CURRENT_IMAGE = this.image
-            } catch (Exception e) {
-                //抛出异常打印错误
-                msg = e.toString()
-            }
-        }
-
-        stage = env.STAGE_NAME + '-build'
-    echo "++++++++++++++++++++++++++++++++++++++++++++++"
-
-    if (isdockerbuild) {
-        //通知gitlab构建成功,也用于后期发送钉钉通知
-        try {
-            updateGitlabCommitStatus(name: '${stage}', state: 'success')
-        }catch (Exception e){
-            echo "构建成功发送错误!"
-        }
-        //new一个Ding对象
-       // new Ding().message(env.BUILD_TASKS, "${stage} success...   √")
-        echo "docker build success"
+    if (registryMap.containsKey(registry)) {
+        credentialsId = registry
+        registryUrl = registryMap[registry]
     } else {
-        //通知gitlab构建失败
-        try{
-            updateGitlabCommitStatus(name: '${stage}', state: 'failed')
-        }catch(Exception e){
-            echo "构建失败发送错误!"
-        }
-       // new Ding().message(env.BUILD_TASKS, "${stage} Failed...  x")
-        echo "docker build error:" + $ { msg }
+        error "Unsupported registry: ${registry}"
     }
+
+    tag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
+    image = "${registryUrl}/${env.repo}/${project}:${tag}"
+    islogin = false
     return this
 }
 
+def build() {
+    def msg = ""
+    Boolean isdockerbuild = false
+    
+    try {
+        sh "docker build -t ${image} ."
+        isdockerbuild = true
+        env.CURRENT_IMAGE = image
+    } catch (Exception e) {
+        msg = e.toString()
+        error "Docker build failed: ${msg}"
+    }
 
-//上传镜像
+    echo "++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "Docker image built successfully: ${env.CURRENT_IMAGE}"
+
+    return this
+}
+
 def push() {
-    this.login()
-    sh "docker push ${this.image}"
-}
-
-
-//登录仓库
-def login() {
-    if (this.islogin || this.credentialsId == "") {
-        return this
-    }
-    withCredentials([usernamePassword(credentialsId: this.credentialsId, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')])
-
-    //获取处理后的登录地址
-    String Registry = this.getRegistry()
-
-    retry(3) {
-        //抛出异常
+    login()
+    if (islogin) {
         try {
-            sh "docker login ${Registry} -u $USERNAME $PASSWORD"
-            this.islogin = true
+            // 执行docker push命令
+            sh "docker push ${image}"
+            
+            // 如果push成功，则设置构建描述
+            currentBuild.description = "docker tag: ${image}"
+            echo "Image pushed successfully and build description set."
         } catch (Exception e) {
-            echo "docker login error:" + ignored.toString()
+            // 如果push失败，则打印错误信息
+            echo "Failed to push image: ${e.message}"
         }
-        return this
+    } else {
+        echo "Login failed, cannot push image."
     }
 }
 
-//接收登录的地址
-def getRegistry() {
-    def login_list = this.image.split('/')
-    if (login_list.size() > 0) {
-        return login_list[0]
+def login() {
+    if (islogin || credentialsId == "") {
+        return this
     }
+
+    echo "Using credentialsId: ${credentialsId}"
+
+    withCredentials([usernamePassword(credentialsId: credentialsId, 
+                                       usernameVariable: 'USERNAME', 
+                                       passwordVariable: 'PASSWORD')]) {
+        try {
+            sh "docker login -u ${USERNAME} -p ${PASSWORD} ${registryUrl}"
+            echo "Docker login successful."
+            islogin = true
+        } catch (Exception e) {
+            echo "Docker login error: ${e.message}"
+        }
+    }
+
+    return this
 }

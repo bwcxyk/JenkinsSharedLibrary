@@ -10,19 +10,23 @@ spec:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk17
     imagePullPolicy: IfNotPresent
-  - name: node
-    image: yaokun/node:14.19.3
-    imagePullPolicy: IfNotPresent
+  - name: gradle
+    # image: gradle:4.10.3-jdk8
+    image: gradle:6.9.4-jdk8
     env:
-      - name: NODE_OPTIONS
-        value: '--max-old-space-size=3072'
+      - name: GRADLE_OPTS
+        value: '-Xms512m -Xmx2g'
     resources: # 资源配额
       limits:  # 限制资源（上限）
-        cpu: 3000m # CPU限制
-        memory: 4500Mi # 内存限制
+        cpu: 2000m # CPU限制
+        memory: 4000Mi # 内存限制
       requests: # 请求资源（下限）
-        cpu: 2000m  # CPU预留
+        cpu: 1500m  # CPU预留
         memory: 2000Mi  # 内存预留
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /home/gradle/.gradle/caches/modules-2/files-2.1
+      name: jenkins-maven
     command:
     - cat
     tty: true
@@ -42,3 +46,6 @@ spec:
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
+    - name: jenkins-maven
+      persistentVolumeClaim:
+        claimName: jenkins-maven

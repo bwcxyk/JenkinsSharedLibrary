@@ -27,29 +27,29 @@ spec:
       name: jenkins-maven
     tty: true
   - name: docker
-    image: docker:latest
+    image: docker:dind
     imagePullPolicy: IfNotPresent
     command:
     - cat
-    env:
-      - name: DOCKER_BUILDKIT
-        value: 0
+    # env:
+    #   - name: DOCKER_BUILDKIT
+    #     value: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock
     tty: true
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: IfNotPresent
-    command:
-    - cat
-    env:
-      - name: KANIKO_REGISTRY_MAP
-        value: index.docker.io=dockerproxy.com;index.docker.io=docker.mirrors.ustc.edu.cn;index.docker.io=docker.nju.edu.cn
-    volumeMounts:
-    - name: kaniko-secret
-      mountPath: /kaniko/.docker
-    tty: true
+  # - name: kaniko
+  #   image: 192.168.1.60/library/kaniko-executor:debug
+  #   imagePullPolicy: IfNotPresent
+  #   command:
+  #   - cat
+  #   env:
+  #     - name: KANIKO_REGISTRY_MAP
+  #       value: index.docker.io=docker.m.daocloud.io;index.docker.io=jockerhub.com;index.docker.io=dh-mirror.gitverse.ru
+  #   volumeMounts:
+  #   - name: registry-secret
+  #     mountPath: /kaniko/.docker
+  #   tty: true
   volumes:
     - name: dockersock
       hostPath:
@@ -57,9 +57,9 @@ spec:
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
-    - name: kaniko-secret
-      secret:
-        secretName: registry-secret
-        items:
-          - key: .dockerconfigjson
-            path: config.json
+    # - name: registry-secret
+    #   secret:
+    #     secretName: registry-secret
+    #     items:
+    #       - key: config.json
+    #         path: config.json
