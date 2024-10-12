@@ -15,8 +15,8 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    docker.docker("demo")
-                    docker.build()
+                    docker.docker()
+                    docker.build(project: "demo")
                     docker.push()
                 }
             }
