@@ -53,33 +53,28 @@ def docker() {
     return this
 }
 
-def build(String directory = null, String project) {
+def build(String path = '.', String project) {
     image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
     Boolean isdockerbuild = false
 
     try {
-        if (directory) {
-            // 如果传入了目录参数，则切换到该目录并构建
-            sh """
-                cd ${directory}
-                docker build -t ${image} .
-            """
-        } else {
-            // 如果没有传入目录参数，则在当前目录执行构建
-            sh "docker build -t ${image} ."
-        }
-
+        // 执行 Docker 构建命令
+        sh "docker build -t ${image} -f Dockerfile ${path}"
         isdockerbuild = true
+        // 设置环境变量 CURRENT_IMAGE 为构建的镜像名
         env.CURRENT_IMAGE = image
     } catch (Exception e) {
+        // 如果构建失败，捕获异常并记录错误信息
         msg = e.toString()
         error "Docker build failed: ${msg}"
     }
 
+    // 输出成功信息
     echo "++++++++++++++++++++++++++++++++++++++++++++++"
     echo "Docker image built successfully: ${env.CURRENT_IMAGE}"
 
+    // 返回当前对象以支持链式调用
     return this
 }
 
