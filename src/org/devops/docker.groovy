@@ -75,7 +75,6 @@ def build(Map params) {
     }
 
     // 输出成功信息
-    echo "++++++++++++++++++++++++++++++++++++++++++++++"
     echo "Docker image built successfully: ${env.CURRENT_IMAGE}"
 
     // 返回当前对象以支持链式调用
@@ -91,6 +90,8 @@ def push() {
             
             // 如果push成功，则设置构建描述
             currentBuild.description = "docker tag: ${tag}"
+            // 使用ANSI颜色代码打印绿色文本
+            echo "\u001B[1;32m image is: ${image}\u001B[m"
             echo "Image pushed successfully and build description set."
         } catch (Exception e) {
             // 如果push失败，则打印错误信息
