@@ -53,14 +53,18 @@ def docker() {
     return this
 }
 
-def build(String path = '.', String project) {
+def build(Map params) {
+    String Dockerfile = params.get('Dockerfile', "Dockerfile")
+    String path = params.get('path', ".")
+    String project = params.project
+
     image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
     Boolean isdockerbuild = false
 
     try {
         // 执行 Docker 构建命令
-        sh "docker build -t ${image} -f Dockerfile ${path}"
+        sh "docker build -t ${image} -f ${Dockerfile} ${path}"
         isdockerbuild = true
         // 设置环境变量 CURRENT_IMAGE 为构建的镜像名
         env.CURRENT_IMAGE = image
