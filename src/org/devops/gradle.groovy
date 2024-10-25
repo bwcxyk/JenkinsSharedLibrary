@@ -10,7 +10,7 @@ def test(additionalArgs = "") {
 }
 
 def build(additionalArgs = "") {
-    def gradleCommand = "gradle build ${additionalArgs}"
+    def gradleCommand = "gradle build -x test ${additionalArgs}"
     def exitCode = sh(script: gradleCommand, returnStatus: true)
 
     if (exitCode != 0) {
