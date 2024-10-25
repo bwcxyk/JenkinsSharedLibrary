@@ -25,10 +25,10 @@ def readSettingsXml() {
     writeFile file: 'settings.xml', text: settingsContent
 }
 
-def test(additionalMavenArgs = "") {
+def test(additionalArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml test ${additionalMavenArgs}"
+    def mvnCommand = "mvn -s settings.xml test ${additionalArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
@@ -36,10 +36,10 @@ def test(additionalMavenArgs = "") {
     }
 }
 
-def build(additionalMavenArgs = "") {
+def build(additionalArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml clean package -Dmaven.test.skip=true ${additionalMavenArgs}"
+    def mvnCommand = "mvn -s settings.xml clean package -Dmaven.test.skip=true ${additionalArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
@@ -47,10 +47,10 @@ def build(additionalMavenArgs = "") {
     }
 }
 
-def deploy(additionalMavenArgs = "") {
+def deploy(additionalArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml clean deploy -Dmaven.test.skip=true ${additionalMavenArgs}"
+    def mvnCommand = "mvn -s settings.xml clean deploy -Dmaven.test.skip=true ${additionalArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
