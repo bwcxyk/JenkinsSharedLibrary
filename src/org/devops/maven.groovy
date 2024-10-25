@@ -7,7 +7,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    maven.build()
+                    maven.build(params.BUILD_ARGS)
                 }
             }
         }
@@ -25,10 +25,10 @@ def readSettingsXml() {
     writeFile file: 'settings.xml', text: settingsContent
 }
 
-def test() {
+def test(additionalMavenArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml test"
+    def mvnCommand = "mvn -s settings.xml test ${additionalMavenArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
@@ -36,10 +36,10 @@ def test() {
     }
 }
 
-def build() {
+def build(additionalMavenArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml clean package -Dmaven.test.skip=true"
+    def mvnCommand = "mvn -s settings.xml clean package -Dmaven.test.skip=true ${additionalMavenArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
@@ -47,10 +47,10 @@ def build() {
     }
 }
 
-def deploy() {
+def deploy(additionalMavenArgs = "") {
     readSettingsXml()
 
-    def mvnCommand = "mvn -s settings.xml clean deploy -Dmaven.test.skip=true"
+    def mvnCommand = "mvn -s settings.xml clean deploy -Dmaven.test.skip=true ${additionalMavenArgs}"
     def exitCode = sh(script: mvnCommand, returnStatus: true)
 
     if (exitCode != 0) {
