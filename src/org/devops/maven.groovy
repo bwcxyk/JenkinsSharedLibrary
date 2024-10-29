@@ -7,7 +7,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    maven.build(BUILD_ARGS)
+                    maven.build(params.BUILD_ARGS ?: '')
                 }
             }
         }
