@@ -9,7 +9,7 @@ pipeline {
     }
 
     parameters {
-    choice choices: ['local', 'aliyun', 'huaweicloud'], description: '镜像仓库', name: 'registry'
+    choice choices: ['local', 'aliyun', 'huaweicloud'], description: '镜像仓库', name: 'REGISTRY'
     }
     stages{
         stage ('Example') {
@@ -28,7 +28,7 @@ pipeline {
 def docker() {
 
     // 检查 REGISTRY 和 env.repo 是否已经设置
-    if (!REGISTRY) {
+    if (!params.REGISTRY) {
         error "Registry is not set. Please define the 'REGISTRY' parameter."
     }
     if (!env.repo) {
