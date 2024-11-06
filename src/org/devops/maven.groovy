@@ -3,6 +3,11 @@
 
 pipeline {
     agent any
+    
+    parameters {
+    string(name: 'BUILD_ARGS', defaultValue: '', description: '可选的构建工具参数')
+    }
+    
     stages {
         stage ('Example') {
             steps {
