@@ -1,0 +1,47 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jnlp
+  namespace: jenkins
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:latest-jdk17
+    imagePullPolicy: IfNotPresent
+  - name: maven
+    image: maven:3.9-eclipse-temurin-21-alpine
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    resources:
+      limits:
+        cpu: 2500m
+        memory: 4000Mi
+      requests:
+        cpu: 1000m
+        memory: 2000Mi
+    volumeMounts:
+    - mountPath: /usr/local/maven/repository
+      name: jenkins-maven
+    tty: true
+  - name: docker
+    image: docker:dind
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: dockersock
+    tty: true
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: jenkins-maven
+      persistentVolumeClaim:
+        claimName: jenkins-maven
