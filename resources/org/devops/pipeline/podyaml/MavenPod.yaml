@@ -4,8 +4,6 @@ metadata:
   name: jnlp
   namespace: jenkins
 spec:
-  securityContext:
-    runAsUser: 0
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk17
@@ -15,6 +13,9 @@ spec:
     imagePullPolicy: IfNotPresent
     command:
     - cat
+    env:
+      - name: MAVEN_OPTS
+        value: '-Xmx2g'
     resources:
       limits:
         cpu: 2500m
@@ -31,9 +32,9 @@ spec:
     imagePullPolicy: IfNotPresent
     command:
     - cat
-    # env:
-    #   - name: DOCKER_BUILDKIT
-    #     value: 0
+    env:
+      - name: DOCKER_BUILDKIT
+        value: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock
