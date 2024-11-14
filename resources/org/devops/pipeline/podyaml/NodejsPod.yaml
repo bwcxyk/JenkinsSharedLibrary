@@ -4,8 +4,6 @@ metadata:
   name: jnlp
   namespace: jenkins
 spec:
-  securityContext:
-    runAsUser: 0
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk17
