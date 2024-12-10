@@ -102,6 +102,21 @@ def push() {
     } else {
         error "Login failed, cannot push image."
     }
+    // 调用删除方法
+    rmi()
+}
+
+def rmi() {
+    try {
+        // 执行 Docker 镜像删除命令
+        sh "docker rmi ${image}"
+    } catch (Exception e) {
+        // 如果删除失败，捕获异常并记录错误信息
+        msg = e.toString()
+        error "Docker rmi failed: ${msg}"
+    }
+    // 返回当前对象以支持链式调用
+    return this
 }
 
 def login() {
