@@ -1,3 +1,25 @@
+/**
+@Library('jenkinslibrary@master') _
+
+pipeline {
+    agent any
+    
+    parameters {
+    string(name: 'buildCommand', defaultValue: 'npm run build', description: '构建命令')
+    }
+    
+    stages {
+        stage ('Example') {
+            steps {
+                script {
+                    npm.install(npm).build(params.buildCommand ?: '')
+                }
+            }
+        }
+    }
+}
+**/
+
 package org.devops
 
 def install(pkgManager = "npm") {
