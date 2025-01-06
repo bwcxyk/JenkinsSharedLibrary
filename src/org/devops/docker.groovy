@@ -26,11 +26,13 @@ pipeline {
 **/
 
 def docker() {
-
     // 检查 REGISTRY 和 env.repo 是否已经设置
+    def defaultRegistry = "local"
     if (!params.REGISTRY) {
-        error "Registry is not set. Please define the 'REGISTRY' parameter."
+        echo "Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
     }
+    registry = params.REGISTRY ?: defaultRegistry
+
     if (!env.repo) {
         error "Repository is not set. Please define the 'env.repo' environment variable."
     }
@@ -41,11 +43,11 @@ def docker() {
         'huaweicloud'  : "swr.cn-east-2.myhuaweicloud.com"
     ]
 
-    if (registryMap.containsKey(REGISTRY)) {
-        credentialsId = REGISTRY
-        registryUrl = registryMap[REGISTRY]
+    if (registryMap.containsKey(registry)) {
+        credentialsId = registry
+        registryUrl = registryMap[registry]
     } else {
-        error "Unsupported registry: ${REGISTRY}"
+        error "Unsupported registry: ${registry}"
     }
 
     tag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
