@@ -10,6 +10,7 @@ pipeline {
 
     parameters {
     choice choices: ['local', 'aliyun', 'huaweicloud'], description: '镜像仓库', name: 'REGISTRY'
+    // string defaultValue: '1.0', description: '版本', name: 'TAG'
     }
     stages{
         stage ('Example') {
@@ -26,12 +27,13 @@ pipeline {
 **/
 
 def docker() {
+    echo "Params: ${params}"
     // 检查 REGISTRY 和 env.repo 是否已经设置
     def defaultRegistry = "local"
     if (!params.REGISTRY) {
         echo "Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
     }
-    registry = params.REGISTRY ?: defaultRegistry
+    def registry = params.REGISTRY ?: defaultRegistry
 
     if (!env.repo) {
         error "Repository is not set. Please define the 'env.repo' environment variable."
@@ -50,15 +52,20 @@ def docker() {
         error "Unsupported registry: ${registry}"
     }
 
-    tag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
+    def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
+    tag = params.TAG ?: defaultTag
     islogin = false
     return this
 }
 
 def build(Map params) {
-    String Dockerfile = params.get('Dockerfile', "Dockerfile")
+    String dockerfile = params.get('Dockerfile', "Dockerfile")
     String path = params.get('path', ".")
     String project = params.project
+
+    if (!project) {
+        error "project is required"
+    }
 
     image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
@@ -66,10 +73,8 @@ def build(Map params) {
 
     try {
         // 执行 Docker 构建命令
-        sh "docker build -t ${image} -f ${path}/${Dockerfile} ${path}"
+        sh "docker build -t ${image} -f ${path}/${dockerfile} ${path}"
         isdockerbuild = true
-        // 设置环境变量 CURRENT_IMAGE 为构建的镜像名
-        env.CURRENT_IMAGE = image
     } catch (Exception e) {
         // 如果构建失败，捕获异常并记录错误信息
         msg = e.toString()
@@ -77,7 +82,7 @@ def build(Map params) {
     }
 
     // 输出成功信息
-    echo "Docker image built successfully: ${env.CURRENT_IMAGE}"
+    echo "Docker image built successfully: ${image}"
 
     // 返回当前对象以支持链式调用
     return this
