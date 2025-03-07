@@ -12,7 +12,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    npm.install("cnpm").build
+                    npm.install("cnpm").build()
                 }
             }
         }
