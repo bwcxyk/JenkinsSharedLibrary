@@ -5,14 +5,14 @@ pipeline {
     agent any
     
     parameters {
-    string(name: 'buildCommand', defaultValue: 'npm run build', description: '构建命令')
+    choice choices: ['dev', 'prod'], description: '打包环境', name: 'BUILD_ENV'
     }
     
     stages {
         stage ('Example') {
             steps {
                 script {
-                    npm.install("cnpm").build(params.buildCommand ?: '')
+                    npm.install("cnpm").build
                 }
             }
         }
@@ -33,11 +33,18 @@ def install(pkgManager = "npm") {
     return this  // 支持链式调用
 }
 
-def build(buildCommand = "npm run build") {
-    def exitCode = sh(script: buildCommand, returnStatus: true)
-
-    if (exitCode != 0) {
-        error "Build failed with exit code: $exitCode"
+def build() {
+    def defaultBuildenv = "prod"
+    if (!params.BUILD_ENV) {
+        echo "BUILD_ENV is not set. Using default: ${defaultBuildenv}"
+    }
+    def buildEnv = params.BUILD_ENV ?: defaultBuildenv
+    try {
+        echo "Starting build for environment: ${buildEnv}"
+        sh "npm run build:${buildEnv}"
+    } catch (Exception e) {
+        // 捕获构建异常并抛出错误信息
+        error "Build ${buildEnv} failed: ${e.message}"
     }
 
     return this // 支持链式调用
