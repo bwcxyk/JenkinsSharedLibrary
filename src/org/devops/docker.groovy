@@ -17,8 +17,7 @@ pipeline {
             steps {
                 script {
                     docker.docker()
-                    docker.build(project: "demo")
-                    docker.push()
+                    docker.build(project: "demo").push()
                 }
             }
         }
@@ -28,17 +27,19 @@ pipeline {
 
 def docker() {
     echo "Params: ${params}"
-    // 检查 REGISTRY 和 env.repo 是否已经设置
+    // 检查 params.REGISTRY 是否已经设置
     def defaultRegistry = "local"
     if (!params.REGISTRY) {
         echo "Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
     }
     def registry = params.REGISTRY ?: defaultRegistry
 
+    // 检查 env.repo 是否已经设置
     if (!env.repo) {
         error "Repository is not set. Please define the 'env.repo' environment variable."
     }
 
+    // 定义不同 registry 的 URL 映射
     def registryMap = [
         'local'        : "192.168.1.60",
         'aliyun'       : "registry.cn-shanghai.aliyuncs.com",
@@ -52,6 +53,7 @@ def docker() {
         error "Unsupported registry: ${registry}"
     }
 
+    // 设置默认的镜像标签，格式为日期时间加构建ID
     def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${env.BUILD_ID}"
     tag = params.TAG ?: defaultTag
     islogin = false
@@ -67,14 +69,16 @@ def build(Map params) {
         error "project is required"
     }
 
+    // 构建镜像名称
     image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
-    Boolean isdockerbuild = false
+    ansiColor('xterm') {
+        echo "\u001B[93m Building project: ${project} \u001B[0m"
+    }
 
     try {
         // 执行 Docker 构建命令
         sh "docker build -t ${image} -f ${path}/${dockerfile} ${path}"
-        isdockerbuild = true
     } catch (Exception e) {
         // 如果构建失败，捕获异常并记录错误信息
         msg = e.toString()
@@ -95,15 +99,15 @@ def push() {
             // 执行docker push命令
             sh "docker push ${image}"
             
-            // 如果push成功，则设置构建描述
+            // 如果 push 成功，则设置构建描述
             currentBuild.description = "docker tag: ${tag}"
-            // 使用ANSI颜色代码打印绿色文本
+            // 使用 ANSI 颜色代码打印绿色文本
             ansiColor('xterm') {
                 echo "\u001B[1;32m Image is: ${image}\u001B[m"
             }
             echo "Image pushed successfully and build description set."
         } catch (Exception e) {
-            // 如果push失败，则打印错误信息
+            // 如果 push 失败，则打印错误信息
             error "Failed to push image: ${e.message}"
         }
     } else {
@@ -127,12 +131,14 @@ def rmi() {
 }
 
 def login() {
+    // 如果已经登录或者 credentialsId 为空，则直接返回
     if (islogin || credentialsId == "") {
         return this
     }
 
     echo "Using credentialsId: ${credentialsId}"
 
+    // 使用 Jenkins 的 withCredentials 方法获取凭据
     withCredentials([usernamePassword(credentialsId: credentialsId, 
                                        usernameVariable: 'USERNAME', 
                                        passwordVariable: 'PASSWORD')]) {
@@ -146,5 +152,5 @@ def login() {
         }
     }
 
-    return this
+    return islogin
 }
