@@ -3,13 +3,13 @@ package org.devops
 // 格式化输出
 def PrintMes(value,color){
     // 定义 ANSI 转义码常量
-    def RESET = "\033[0m" // 重置所有样式和颜色
-    def RED = "\033[1;31m" // 粗体，红色文本
-    def GREEN = "\033[1;32m" // 粗体，绿色文本
-    def BLUE = "\033[1;34m" // 粗体，蓝色文本
-    def YELLOW = "\033[1;33m" // 粗体，黄色文本
-    def MAGENTA = "\033[1;35m" // 粗体，品红色文本
-    def CYAN = "\033[1;36m" // 粗体，青色文本
+    def RESET = "\u001b[0m" // 重置所有样式和颜色
+    def RED = "\u001b[1;31m" // 粗体，红色文本
+    def GREEN = "\u001b[1;32m" // 粗体，绿色文本
+    def BLUE = "\u001b[1;34m" // 粗体，蓝色文本
+    def YELLOW = "\u001b[1;33m" // 粗体，黄色文本
+    def MAGENTA = "\u001b[1;35m" // 粗体，品红色文本
+    def CYAN = "\u001b[1;36m" // 粗体，青色文本
     def DEFAULT = "\033[1;30m" // 默认颜色（粗体，深灰色文本）
 
     // 定义颜色字典
