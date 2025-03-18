@@ -73,7 +73,7 @@ def build(Map params) {
     image = "${registryUrl}/${env.repo}/${project}:${tag}"
     def msg = ""
     ansiColor('xterm') {
-        echo "\u001B[33m Building project: ${project} \u001B[0m"
+        echo "\u001B[1;35m Building project: ${project} \u001B[0m"
     }
 
     try {
