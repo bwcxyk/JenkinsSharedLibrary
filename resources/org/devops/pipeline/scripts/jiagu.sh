@@ -78,7 +78,7 @@ upload_to_oss() {
 }
 
 # ------------------------- 主逻辑 -------------------------
-if [ "$PUBLISH" = true ]; then
+if [ "$SIGN_SHIELD" = true ]; then
     # 默认执行腾讯加固+jarsigner签名
     tencent_shield
     sign_with_jarsigner
