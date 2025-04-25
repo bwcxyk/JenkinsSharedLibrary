@@ -58,25 +58,6 @@ shield_360() {
       -pkgparam "${WORKSPACE}/app/channels.txt"
 }
 
-# 上传到阿里云OSS
-upload_to_oss() {
-    echo "---------------- 上传到OSS ----------------"
-    local BUILD_TIME=$(date "+%Y%m%d_%H_%M_%S")
-    local UPLOAD_MONTH=$(date "+%Y%m%d")
-    
-    # 压缩加固后的文件
-    cd "${WORKSPACE}/app" && tar -zcvf jiaguAPK.gz jiagu
-    
-    # 配置并上传
-    cd "${WORKSPACE}/ossuploadconfig"
-    ossutil config -e "$ALI_OSS_ENDPOINT" -i "$ALI_OSS_AK" -k "$ALI_OSS_SK"
-    ossutil cp "${WORKSPACE}/app/jiaguAPK.gz" \
-      "oss://bucket/app/android/jaiguapk/${UPLOAD_MONTH}/jiaguAPK_${BUILD_TIME}.gz"
-    
-    local DOWNLOAD_URL="http://bucket.oss-cn-shanghai.aliyuncs.com/app/android/jaiguapk/${UPLOAD_MONTH}/jiaguAPK_${BUILD_TIME}.gz"
-    echo "下载地址：${DOWNLOAD_URL}"
-}
-
 # ------------------------- 主逻辑 -------------------------
 if [ "$SIGN_SHIELD" = true ]; then
     # 默认执行腾讯加固+jarsigner签名
