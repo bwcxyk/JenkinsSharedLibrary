@@ -51,6 +51,12 @@ spec:
   #   - name: registry-secret
   #     mountPath: /kaniko/.docker
   #   tty: true
+  - name: kubectl
+    image: bitnami/kubectl:1.23.10
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
   volumes:
     - name: dockersock
       hostPath:
