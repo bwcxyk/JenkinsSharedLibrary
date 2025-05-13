@@ -47,6 +47,8 @@ spec:
     command:
       - cat
     tty: true
+    securityContext:
+      runAsUser: 1000
   volumes:
     - name: dockersock
       hostPath:
