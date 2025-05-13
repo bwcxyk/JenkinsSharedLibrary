@@ -4,6 +4,8 @@ metadata:
   name: jnlp
   namespace: jenkins
 spec:
+  securityContext:
+    runAsUser: 1000 # default UID of jenkins user in agent image
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:alpine-jdk21
