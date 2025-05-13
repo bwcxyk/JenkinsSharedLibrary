@@ -4,8 +4,8 @@ metadata:
   name: jnlp
   namespace: jenkins
 spec:
-  securityContext:
-    runAsUser: 1000 # default UID of jenkins user in agent image
+  # securityContext:
+  #   runAsUser: 0
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:alpine-jdk21
@@ -36,28 +36,16 @@ spec:
     - cat
     env:
       - name: DOCKER_BUILDKIT
-        value: 0
+        value: '0'
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: dockersock
     tty: true
-  # - name: kaniko
-  #   image: 192.168.1.60/library/kaniko-executor:debug
-  #   imagePullPolicy: IfNotPresent
-  #   command:
-  #   - cat
-  #   env:
-  #     - name: KANIKO_REGISTRY_MAP
-  #       value: index.docker.io=docker.m.daocloud.io;index.docker.io=jockerhub.com;index.docker.io=dh-mirror.gitverse.ru
-  #   volumeMounts:
-  #   - name: registry-secret
-  #     mountPath: /kaniko/.docker
-  #   tty: true
   - name: kubectl
-    image: bitnami/kubectl:1.23.10
+    image: bitnami/kubectl:1.26.15
     imagePullPolicy: IfNotPresent
     command:
-    - cat
+      - cat
     tty: true
   volumes:
     - name: dockersock
@@ -66,9 +54,3 @@ spec:
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
-    # - name: registry-secret
-    #   secret:
-    #     secretName: registry-secret
-    #     items:
-    #       - key: config.json
-    #         path: config.json
