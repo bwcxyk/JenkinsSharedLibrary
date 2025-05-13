@@ -1,0 +1,26 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jnlp
+  namespace: jenkins
+spec:
+  containers:
+  - name: kaniko
+    image: 192.168.1.60/library/kaniko-executor:debug
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    env:
+      - name: KANIKO_REGISTRY_MAP
+        value: index.docker.io=docker.m.daocloud.io;index.docker.io=jockerhub.com;index.docker.io=dh-mirror.gitverse.ru
+    volumeMounts:
+    - name: registry-secret
+      mountPath: /kaniko/.docker
+    tty: true
+  volumes:
+    - name: registry-secret
+      secret:
+        secretName: registry-secret
+        items:
+          - key: config.json
+            path: config.json
