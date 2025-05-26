@@ -24,6 +24,9 @@ spec:
     command:
     - cat
     tty: true
+    volumeMounts:
+    - mountPath: /data/.pnpm-store
+      name: node-pnpm
   - name: docker
     image: docker:latest
     imagePullPolicy: IfNotPresent
@@ -40,3 +43,6 @@ spec:
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
+    - name: node-pnpm
+      persistentVolumeClaim:
+        claimName: node-pnpm
