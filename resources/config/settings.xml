@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
 
-<localRepository>/usr/local/maven/repository</localRepository>
+  <localRepository>/usr/local/maven/repository</localRepository>
 
-  <pluginGroups>
-
-  </pluginGroups>
-
-  <proxies>
-  </proxies>
+  <pluginGroups></pluginGroups>
+  <proxies></proxies>
 
   <servers>
     <server>
-      <id>huolan</id>
-      <username>admin</username>
-      <password>admin</password>
-    </server>
-    <server>
       <id>huolan-releases</id>
       <username>admin</username>
-      <password>admin</password>
+      <password>Admin123</password>
     </server>
     <server>
       <id>huolan-snapshots</id>
       <username>admin</username>
-      <password>admin</password>
+      <password>Admin123</password>
     </server>
   </servers>
 
   <mirrors>
     <mirror>
-      <id>local-mirror</id>
-      <name>Local Mirror</name>
-      <url>http://192.168.1.200:8081/repository/maven-public/</url>
-      <mirrorOf>external:http:*,central</mirrorOf>
-      <!-- 禁用 HTTP 阻止 -->
-      <blocked>false</blocked>
+      <id>aliyunmaven</id>
+      <mirrorOf>central</mirrorOf>
+      <name>阿里云公共仓库</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+    </mirror>
+    <mirror>
+      <id>yfmaven</id>
+      <mirrorOf>huolan-repo</mirrorOf>
+      <name>内部公共仓库</name>
+      <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
     </mirror>
   </mirrors>
 
@@ -47,8 +41,9 @@
       <id>huolan</id>
       <repositories>
         <repository>
-          <id>huolan</id>
-          <url>http://192.168.1.200:8081/repository/maven-public/</url>
+          <id>huolan-repo</id>
+          <name>Huolan Repository</name>
+          <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -59,10 +54,10 @@
       </repositories>
       <properties>
         <altReleaseDeploymentRepository>
-          huolan-releases::default::http://192.168.1.200:8081/repository/maven-releases/
+          huolan-releases::default::http://192.168.1.85:8082/artifactory/maven-release-local/
         </altReleaseDeploymentRepository>
         <altSnapshotDeploymentRepository>
-          huolan-snapshots::default::http://192.168.1.200:8081/repository/maven-snapshots/
+          huolan-snapshots::default::http://192.168.1.85:8082/artifactory/maven-snapshot-local/
         </altSnapshotDeploymentRepository>
       </properties>
     </profile>
@@ -71,5 +66,4 @@
   <activeProfiles>
     <activeProfile>huolan</activeProfile>
   </activeProfiles>
-
 </settings>
