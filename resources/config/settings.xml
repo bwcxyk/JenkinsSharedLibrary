@@ -12,12 +12,12 @@
     <server>
       <id>huolan-releases</id>
       <username>admin</username>
-      <password>Admin123</password>
+      <password>admin</password>
     </server>
     <server>
       <id>huolan-snapshots</id>
       <username>admin</username>
-      <password>Admin123</password>
+      <password>admin</password>
     </server>
   </servers>
 
@@ -28,12 +28,6 @@
       <name>阿里云公共仓库</name>
       <url>https://maven.aliyun.com/repository/public</url>
     </mirror>
-    <mirror>
-      <id>yfmaven</id>
-      <mirrorOf>huolan-repo</mirrorOf>
-      <name>内部公共仓库</name>
-      <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
-    </mirror>
   </mirrors>
 
   <profiles>
@@ -42,7 +36,6 @@
       <repositories>
         <repository>
           <id>huolan-repo</id>
-          <name>Huolan Repository</name>
           <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
           <releases>
             <enabled>true</enabled>
@@ -50,6 +43,8 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
+          <!-- 禁用 HTTP 拦截 -->
+          <blocked>false</blocked>
         </repository>
       </repositories>
       <properties>
