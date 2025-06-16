@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
 
-  <localRepository>/usr/local/maven/repository</localRepository>
+<localRepository>/usr/local/maven/repository</localRepository>
 
-  <pluginGroups></pluginGroups>
-  <proxies></proxies>
+  <pluginGroups>
+
+  </pluginGroups>
+
+  <proxies>
+  </proxies>
 
   <servers>
     <server>
@@ -25,8 +30,15 @@
     <mirror>
       <id>aliyunmaven</id>
       <mirrorOf>central</mirrorOf>
-      <name>阿里云公共仓库</name>
+      <name>中央仓库镜像</name>
       <url>https://maven.aliyun.com/repository/public</url>
+    </mirror>
+    <mirror>
+      <id>allow-http-for-huolan</id>
+      <mirrorOf>huolan-repo</mirrorOf>
+      <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
+      <!-- 解除 HTTP 拦截 -->
+      <blocked>false</blocked>
     </mirror>
   </mirrors>
 
@@ -36,6 +48,7 @@
       <repositories>
         <repository>
           <id>huolan-repo</id>
+          <name>私有仓库</name>
           <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
           <releases>
             <enabled>true</enabled>
@@ -43,8 +56,6 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
-          <!-- 禁用 HTTP 拦截 -->
-          <blocked>false</blocked>
         </repository>
       </repositories>
       <properties>
@@ -61,4 +72,5 @@
   <activeProfiles>
     <activeProfile>huolan</activeProfile>
   </activeProfiles>
+
 </settings>
