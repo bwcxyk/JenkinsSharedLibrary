@@ -151,7 +151,7 @@ class docker implements Serializable {
                                                       passwordVariable: 'PASSWORD')]) {
             try {
                 steps.sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin ${registryUrl}"
-                steps.echo "✔ Docker login successful."
+                steps.echo "✅ Docker login successful."
                 islogin = true
             } catch (Exception e) {
                 steps.echo "Docker login error: ${e.message}"
