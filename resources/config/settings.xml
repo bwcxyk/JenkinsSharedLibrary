@@ -11,6 +11,7 @@
   </pluginGroups>
 
   <proxies>
+
   </proxies>
 
   <servers>
@@ -30,15 +31,15 @@
     <mirror>
       <id>aliyunmaven</id>
       <mirrorOf>central</mirrorOf>
-      <name>中央仓库镜像</name>
+      <name>阿里镜像</name>
       <url>https://maven.aliyun.com/repository/public</url>
     </mirror>
     <mirror>
-      <id>allow-http-for-huolan</id>
-      <mirrorOf>huolan-repo</mirrorOf>
-      <url>http://192.168.1.85:8082/artifactory/maven-public/</url>
-      <!-- 解除 HTTP 拦截 -->
-      <blocked>false</blocked>
+      <id>maven-default-http-blocker</id>
+      <mirrorOf>nonexistent</mirrorOf>
+      <name>Disabled HTTP blocker</name>
+      <url>http://0.0.0.0/</url>
+      <blocked>true</blocked>
     </mirror>
   </mirrors>
 
