@@ -1,6 +1,6 @@
 /**
 @Library('jenkinslibrary@master') _
-def docker = new org.devops.dockerHelper(this)
+def docker = new org.devops.docker(this)
 
 pipeline {
     agent any
