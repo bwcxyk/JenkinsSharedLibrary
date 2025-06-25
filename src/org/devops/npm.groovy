@@ -23,7 +23,12 @@ pipeline {
 package org.devops
 
 def install(pkgManager = "npm") {
-    def installCommand = "${pkgManager} install"
+    // 打印 Node.js 版本
+    echo "=== Checking Node.js version ==="
+    sh "node -v"
+
+    // def installCommand = "${pkgManager} install"
+    def installCommand = "${pkgManager} ci"
 
     def exitCode = sh(script: installCommand, returnStatus: true)
     if (exitCode != 0) {
