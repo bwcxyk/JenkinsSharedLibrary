@@ -27,12 +27,13 @@ def install(pkgManager = "npm") {
     echo "=== Checking Node.js version ==="
     sh "node -v"
 
-    // def installCommand = "${pkgManager} install"
-    def installCommand = "${pkgManager} ci"
+    // String installCommand = "${pkgManager} install"
+    String installCommand = "${pkgManager} ci"
+    echo "Executing: ${installCommand}"
 
     def exitCode = sh(script: installCommand, returnStatus: true)
     if (exitCode != 0) {
-        error "${installCommand} failed with exit code: $exitCode"
+        error "${installCommand} failed with exit code: ${exitCode}"
     }
 
     return this  // 支持链式调用
@@ -44,13 +45,15 @@ def build() {
         echo "BUILD_ENV is not set. Using default: ${defaultBuildenv}"
     }
     def buildEnv = params.BUILD_ENV ?: defaultBuildenv
-    try {
-        echo "Starting build for environment: ${buildEnv}"
-        sh "npm run build:${buildEnv}"
-    } catch (Exception e) {
-        // 捕获构建异常并抛出错误信息
-        error "Build ${buildEnv} failed: ${e.message}"
+
+    String buildCommand = "npm run build:${buildEnv}"
+    echo "Executing: ${buildCommand}"
+
+    def exitCode = sh(script: buildCommand, returnStatus: true)
+    if (exitCode != 0) {
+        error "${buildCommand} failed with exit code: ${exitCode}"
     }
 
     return this // 支持链式调用
 }
+
