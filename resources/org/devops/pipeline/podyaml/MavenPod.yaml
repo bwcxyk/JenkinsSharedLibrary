@@ -14,7 +14,7 @@ spec:
     image: maven:3.9-eclipse-temurin-8-alpine
     imagePullPolicy: IfNotPresent
     command:
-    - cat
+      - cat
     env:
       - name: MAVEN_OPTS
         value: '-Xmx2g'
@@ -26,20 +26,20 @@ spec:
         cpu: 1000m
         memory: 2000Mi
     volumeMounts:
-    - mountPath: /usr/local/maven/repository
-      name: jenkins-maven
+      - mountPath: /usr/local/maven/repository
+        name: jenkins-maven
     tty: true
   - name: docker
     image: docker:dind
     imagePullPolicy: IfNotPresent
     command:
-    - cat
+      - cat
     env:
       - name: DOCKER_BUILDKIT
         value: '0'
     volumeMounts:
-    - mountPath: /var/run/docker.sock
-      name: dockersock
+      - mountPath: /var/run/docker.sock
+        name: dockersock
     tty: true
   - name: kaniko
     # 使用 debug 镜像是因为 latest 镜像中没有常用的 shell 工具（如 cat）
@@ -47,7 +47,7 @@ spec:
     # image: gcr.io/kaniko-project/executor:latest
     image: gcr.m.daocloud.io/kaniko-project/executor:debug
     command:
-    - cat
+      - cat
     env:
       - name: KANIKO_REGISTRY_MAP
         value: |
@@ -60,8 +60,10 @@ spec:
           }
     tty: true
     volumeMounts:
-    - name: kaniko-secret
-      mountPath: /kaniko/.docker
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker/config.json
+        subPath: .dockerconfigjson
+        readOnly: true
   - name: kubectl
     image: bitnami/kubectl:1.26.15
     imagePullPolicy: IfNotPresent
