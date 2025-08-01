@@ -14,7 +14,7 @@
 
 package org.devops
 
-class kaniko implements Serializable {
+class Kaniko implements Serializable {
 
     def steps  // pipeline上下文
 
@@ -24,7 +24,7 @@ class kaniko implements Serializable {
     def project = ""
 
     // 构造函数传入 steps
-    kaniko(steps) {
+    Kaniko(steps) {
         this.steps = steps
     }
 

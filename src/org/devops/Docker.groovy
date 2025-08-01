@@ -28,7 +28,7 @@ pipeline {
 
 package org.devops
 
-class docker implements Serializable {
+class Docker implements Serializable {
 
     def steps  // pipeline上下文
 
@@ -40,7 +40,7 @@ class docker implements Serializable {
     def project = ""
 
     // 构造函数传入 steps
-    docker(steps) {
+    Docker(steps) {
         this.steps = steps
     }
 

@@ -14,7 +14,7 @@
 
 package org.devops
 
-class buildah implements Serializable {
+class Buildah implements Serializable {
 
     def steps
     def credentialsId = ""
@@ -24,7 +24,7 @@ class buildah implements Serializable {
     def project = ""
     def isLogin = false
 
-    buildah(steps) {
+    Buildah(steps) {
         this.steps = steps
     }
 
