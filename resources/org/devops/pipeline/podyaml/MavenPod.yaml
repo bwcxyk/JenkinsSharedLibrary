@@ -41,6 +41,17 @@ spec:
     - mountPath: /var/run/docker.sock
       name: dockersock
     tty: true
+  - name: kaniko
+    # 使用 debug 镜像是因为 latest 镜像中没有常用的 shell 工具（如 cat）
+    # Jenkins pod 模板默认通过 `cat` 命令保持容器存活，否则构建会失败
+    # image: gcr.io/kaniko-project/executor:debug
+    image: gcr.m.daocloud.io/kaniko-project/executor:debug
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker
   - name: kubectl
     image: bitnami/kubectl:1.26.15
     imagePullPolicy: IfNotPresent
@@ -53,6 +64,9 @@ spec:
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
