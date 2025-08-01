@@ -46,6 +46,7 @@ spec:
     # Jenkins pod 模板默认通过 `cat` 命令保持容器存活，否则构建会失败
     # image: gcr.io/kaniko-project/executor:latest
     image: gcr.m.daocloud.io/kaniko-project/executor:debug
+    imagePullPolicy: IfNotPresent
     command:
       - cat
     env:
@@ -57,6 +58,18 @@ spec:
         mountPath: /kaniko/.docker/config.json
         subPath: .dockerconfigjson
         readOnly: true
+  - name: buildah
+    image: quay.io/buildah/stable:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
   - name: kubectl
     image: bitnami/kubectl:1.26.15
     imagePullPolicy: IfNotPresent
@@ -72,6 +85,9 @@ spec:
     - name: kaniko-secret
       secret:
         secretName: regcred
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
