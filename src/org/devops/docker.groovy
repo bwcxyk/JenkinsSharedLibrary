@@ -17,7 +17,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    docker.docker(params)
+                    docker.init(params)
                     docker.build(project: "demo").push()
                 }
             }
