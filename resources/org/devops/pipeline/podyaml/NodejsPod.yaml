@@ -22,11 +22,11 @@ spec:
         cpu: 2000m  # CPU预留
         memory: 2000Mi  # 内存预留
     command:
-    - cat
+      - cat
     tty: true
-    volumeMounts:
-    - mountPath: /data/.pnpm-store
-      name: node-pnpm
+    # volumeMounts:
+    # - mountPath: /data/.pnpm-store
+    #   name: node-pnpm
   - name: docker
     image: docker:latest
     imagePullPolicy: IfNotPresent
@@ -37,12 +37,27 @@ spec:
     - mountPath: /var/run/docker.sock
       name: dockersock
     command:
-    - cat
+      - cat
     tty: true
+  - name: buildah
+    image: quay.io/buildah/stable:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
   volumes:
+    # - name: node-pnpm
+    #   persistentVolumeClaim:
+    #     claimName: node-pnpm
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
-    - name: node-pnpm
-      persistentVolumeClaim:
-        claimName: node-pnpm
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf

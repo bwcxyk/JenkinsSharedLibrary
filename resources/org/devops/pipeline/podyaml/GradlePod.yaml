@@ -26,7 +26,7 @@ spec:
     - mountPath: /home/gradle/.gradle/caches/modules-2/files-2.1
       name: jenkins-maven
     command:
-    - cat
+      - cat
     tty: true
   - name: docker
     image: docker:latest
@@ -38,12 +38,27 @@ spec:
     - mountPath: /var/run/docker.sock
       name: dockersock
     command:
-    - cat
+      - cat
     tty: true
+  - name: buildah
+    image: quay.io/buildah/stable:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
   volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf
