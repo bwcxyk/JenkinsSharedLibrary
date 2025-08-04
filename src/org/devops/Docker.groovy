@@ -1,6 +1,6 @@
 /**
-@Library('jenkinslibrary@master') _
-def docker = new org.devops.docker(this)
+@Library('jenkinslibrary@main') _
+def docker = dockerHelper(this)
 
 pipeline {
     agent any
@@ -30,7 +30,7 @@ package org.devops
 
 class Docker implements Serializable {
 
-    def steps  // pipeline上下文
+    def script  // pipeline上下文
 
     def credentialsId = ""
     def registryUrl = ""
@@ -39,22 +39,22 @@ class Docker implements Serializable {
     def image = ""
     def project = ""
 
-    // 构造函数传入 steps
-    Docker(steps) {
-        this.steps = steps
+    // 构造函数传入 script 
+    Docker(script) {
+        this.script = script
     }
 
     def init(Map params = [:]) {
-        steps.echo "Params: ${params}"
+        script.echo "Params: ${params}"
         def defaultRegistry = "local"
 
         if (!params.REGISTRY) {
-            steps.echo "❗Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
+            script.echo "❗Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
         }
         def registry = params.REGISTRY ?: defaultRegistry
 
-        if (!steps.env.repo) {
-            steps.error "❗Repository is not set. Please define the 'env.repo' environment variable."
+        if (!script.env.repo) {
+            script.error "❗Repository is not set. Please define the 'env.repo' environment variable."
         }
 
         def registryMap = [
@@ -67,10 +67,10 @@ class Docker implements Serializable {
             credentialsId = registry
             registryUrl = registryMap[registry]
         } else {
-            steps.error "Unsupported registry: ${registry}"
+            script.error "Unsupported registry: ${registry}"
         }
 
-        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${steps.env.BUILD_ID}"
+        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${script.env.BUILD_ID}"
         tag = params.TAG ?: defaultTag
         islogin = false
 
@@ -80,22 +80,22 @@ class Docker implements Serializable {
     def build(Map params) {
         String dockerfile = params.get('Dockerfile', "Dockerfile")
         String path = params.get('path', ".")
-        project = params.project
+        project = params.get('project')
 
         if (!project) {
-            steps.error "project is required"
+            script.error "project is required"
         }
 
-        image = "${registryUrl}/${steps.env.repo}/${project}:${tag}"
+        image = "${registryUrl}/${script.env.repo}/${project}:${tag}"
 
-        steps.ansiColor('xterm') {
-            steps.echo "\u001B[1;35m🔧 Building project: ${project} \u001B[0m"
+        script.ansiColor('xterm') {
+            script.echo "\u001B[1;35m🔧 Building project: ${project} \u001B[0m"
         }
 
         try {
-            steps.sh "docker build -t ${image} -f ${path}/${dockerfile} ${path}"
+            script.sh "docker build -t ${image} -f ${path}/${dockerfile} ${path}"
         } catch (Exception e) {
-            steps.error "Docker build failed: ${e.message}"
+            script.error "Docker build failed: ${e.message}"
         }
 
         return this
@@ -105,25 +105,25 @@ class Docker implements Serializable {
         login()
         if (islogin) {
             try {
-                steps.sh "docker push ${image}"
+                script.sh "docker push ${image}"
 
-                steps.currentBuild.description = "docker tag: ${tag}"
+                script.currentBuild.description = "docker tag: ${tag}"
 
                 def imageInfo = [
                     project: project,
                     image: image
                 ]
-                steps.writeJSON file: "${project}-image.json", json: imageInfo
-                steps.archiveArtifacts artifacts: "${project}-image.json"
+                script.writeJSON file: "${project}-image.json", json: imageInfo
+                script.archiveArtifacts artifacts: "${project}-image.json"
 
-                steps.ansiColor('xterm') {
-                    steps.echo "\u001B[1;32m📦 Image is: ${image}\u001B[m"
+                script.ansiColor('xterm') {
+                    script.echo "\u001B[1;32m📦 Image is: ${image}\u001B[m"
                 }
             } catch (Exception e) {
-                steps.error "Failed to push image: ${e.message}"
+                script.error "Failed to push image: ${e.message}"
             }
         } else {
-            steps.error "Login failed, cannot push image."
+            script.error "Login failed, cannot push image."
         }
 
         rmi()
@@ -132,9 +132,9 @@ class Docker implements Serializable {
 
     def rmi() {
         try {
-            steps.sh "docker rmi ${image}"
+            script.sh "docker rmi ${image}"
         } catch (Exception e) {
-            steps.error "Docker rmi failed: ${e.message}"
+            script.error "Docker rmi failed: ${e.message}"
         }
         return this
     }
@@ -144,17 +144,17 @@ class Docker implements Serializable {
             return this
         }
 
-        steps.echo "Using credentialsId: ${credentialsId}"
+        script.echo "Using credentialsId: ${credentialsId}"
 
-        steps.withCredentials([steps.usernamePassword(credentialsId: credentialsId,
+        script.withCredentials([script.usernamePassword(credentialsId: credentialsId,
                                                       usernameVariable: 'USERNAME',
                                                       passwordVariable: 'PASSWORD')]) {
             try {
-                steps.sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin ${registryUrl}"
-                steps.echo "✅ Docker login successful."
+                script.sh "echo \$PASSWORD | docker login -u \$USERNAME --password-stdin ${registryUrl}"
+                script.echo "✅ Docker login successful."
                 islogin = true
             } catch (Exception e) {
-                steps.echo "Docker login error: ${e.message}"
+                script.echo "Docker login error: ${e.message}"
             }
         }
 

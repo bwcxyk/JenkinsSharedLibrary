@@ -1,4 +1,9 @@
 /**
+@Library('jenkinslibrary@main') _
+def buildah = buildahHelper(this)
+
+pipeline {
+    stages{
         stage("BuildImages"){
             steps{
                 container('buildah'){
@@ -10,13 +15,15 @@
                 }
             }
         }
+    }
+}
 **/
 
 package org.devops
 
 class Buildah implements Serializable {
 
-    def steps
+    def script
     def credentialsId = ""
     def registryUrl = ""
     def tag = ""
@@ -24,12 +31,12 @@ class Buildah implements Serializable {
     def project = ""
     def isLogin = false
 
-    Buildah(steps) {
-        this.steps = steps
+    Buildah(script) {
+        this.script = script
     }
 
     def init(Map params = [:]) {
-        steps.echo "Params: ${params}"
+        script.echo "Params: ${params}"
         def defaultRegistry = "local"
 
         def registry = params.REGISTRY ?: defaultRegistry
@@ -40,17 +47,17 @@ class Buildah implements Serializable {
         ]
 
         if (!registryMap.containsKey(registry)) {
-            steps.error "Unsupported registry: ${registry}"
+            script.error "Unsupported registry: ${registry}"
         }
 
         credentialsId = registry
         registryUrl = registryMap[registry]
 
-        if (!steps.env.repo) {
-            steps.error "❗Repository is not set. Please define the 'env.repo' environment variable."
+        if (!script.env.repo) {
+            script.error "❗Repository is not set. Please define the 'env.repo' environment variable."
         }
 
-        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${steps.env.BUILD_ID}"
+        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${script.env.BUILD_ID}"
         tag = params.TAG ?: defaultTag
         isLogin = false
 
@@ -60,25 +67,25 @@ class Buildah implements Serializable {
     def build(Map params) {
         String dockerfile = params.get('Dockerfile', "Dockerfile")
         String context = params.get('path', ".")
-        project = params.project
+        project = params.get('project')
 
         if (!project) {
-            steps.error "project is required"
+            script.error "project is required"
         }
 
-        image = "${registryUrl}/${steps.env.repo}/${project}:${tag}"
+        image = "${registryUrl}/${script.env.repo}/${project}:${tag}"
 
-        steps.ansiColor('xterm') {
-            steps.echo "\u001B[1;35m🔧 Building project: ${project} with Buildah \u001B[0m"
+        script.ansiColor('xterm') {
+            script.echo "\u001B[1;35m🔧 Building project: ${project} with Buildah \u001B[0m"
         }
 
         try {
             // 使用 Buildah bud 命令构建镜像
-            steps.sh """
+            script.sh """
                 buildah bud --format=docker --file=${context}/${dockerfile} --tag=${image} ${context}
             """
         } catch (Exception e) {
-            steps.error "Buildah build failed: ${e.message}"
+            script.error "Buildah build failed: ${e.message}"
         }
 
         return this
@@ -89,19 +96,19 @@ class Buildah implements Serializable {
             return this
         }
 
-        steps.echo "Using credentialsId: ${credentialsId}"
+        script.echo "Using credentialsId: ${credentialsId}"
 
-        steps.withCredentials([steps.usernamePassword(credentialsId: credentialsId,
+        script.withCredentials([script.usernamePassword(credentialsId: credentialsId,
                                                       usernameVariable: 'USERNAME',
                                                       passwordVariable: 'PASSWORD')]) {
             try {
-                steps.sh """
+                script.sh """
                     buildah login -u \$USERNAME -p \$PASSWORD ${registryUrl}
                 """
-                steps.echo "✅ Buildah login successful."
+                script.echo "✅ Buildah login successful."
                 isLogin = true
             } catch (Exception e) {
-                steps.error "Buildah login failed: ${e.message}"
+                script.error "Buildah login failed: ${e.message}"
             }
         }
 
@@ -111,25 +118,25 @@ class Buildah implements Serializable {
     def push() {
         login()
         if (!isLogin) {
-            steps.error "Login failed, cannot push image."
+            script.error "Login failed, cannot push image."
         }
 
         try {
-            steps.sh "buildah push ${image}"
-            steps.currentBuild.description = "Image tag: ${tag}"
+            script.sh "buildah push ${image}"
+            script.currentBuild.description = "Image tag: ${tag}"
 
             def imageInfo = [
                 project: project,
                 image: image
             ]
-            steps.writeJSON file: "${project}-image.json", json: imageInfo
-            steps.archiveArtifacts artifacts: "${project}-image.json"
+            script.writeJSON file: "${project}-image.json", json: imageInfo
+            script.archiveArtifacts artifacts: "${project}-image.json"
 
-            steps.ansiColor('xterm') {
-                steps.echo "\u001B[1;32m📦 Image pushed: ${image}\u001B[0m"
+            script.ansiColor('xterm') {
+                script.echo "\u001B[1;32m📦 Image pushed: ${image}\u001B[0m"
             }
         } catch (Exception e) {
-            steps.error "Buildah push failed: ${e.message}"
+            script.error "Buildah push failed: ${e.message}"
         }
 
         return this
@@ -137,9 +144,9 @@ class Buildah implements Serializable {
 
     def rmi() {
         try {
-            steps.sh "buildah rmi ${image}"
+            script.sh "buildah rmi ${image}"
         } catch (Exception e) {
-            steps.echo "Buildah rmi failed: ${e.message}"
+            script.echo "Buildah rmi failed: ${e.message}"
         }
         return this
     }

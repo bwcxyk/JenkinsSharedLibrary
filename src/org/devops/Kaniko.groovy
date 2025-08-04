@@ -1,4 +1,9 @@
 /**
+@Library('jenkinslibrary@main') _
+def kaniko = kanikoHelper(this)
+
+pipeline {
+    stages{
         stage("BuildImages"){
             steps{
                 container('kaniko'){
@@ -10,35 +15,37 @@
                 }
             }
         }
+    }
+}
 **/
 
 package org.devops
 
 class Kaniko implements Serializable {
 
-    def steps  // pipeline上下文
+    def script  // pipeline上下文
 
     def registryUrl = ""
     def tag = ""
     def image = ""
     def project = ""
 
-    // 构造函数传入 steps
-    Kaniko(steps) {
-        this.steps = steps
+    // 构造函数传入 script
+    Kaniko(script) {
+        this.script = script
     }
 
     def init(Map params = [:]) {
-        steps.echo "Params: ${params}"
+        script.echo "Params: ${params}"
         def defaultRegistry = "local"
 
         if (!params.REGISTRY) {
-            steps.echo "❗Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
+            script.echo "❗Registry is not set. Please define the 'REGISTRY' parameter. Using default: ${defaultRegistry}"
         }
         def registry = params.REGISTRY ?: defaultRegistry
 
-        if (!steps.env.repo) {
-            steps.error "❗Repository is not set. Please define the 'env.repo' environment variable."
+        if (!script.env.repo) {
+            script.error "❗Repository is not set. Please define the 'env.repo' environment variable."
         }
 
         def registryMap = [
@@ -50,10 +57,10 @@ class Kaniko implements Serializable {
         if (registryMap.containsKey(registry)) {
             registryUrl = registryMap[registry]
         } else {
-            steps.error "Unsupported registry: ${registry}"
+            script.error "Unsupported registry: ${registry}"
         }
 
-        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${steps.env.BUILD_ID}"
+        def defaultTag = "${new Date().format('yyyyMMddHHmmss')}_${script.env.BUILD_ID}"
         tag = params.TAG ?: defaultTag
 
         return this
@@ -62,20 +69,20 @@ class Kaniko implements Serializable {
     def build(Map params) {
         String dockerfile = params.get('Dockerfile', "Dockerfile")
         String path = params.get('path', ".")
-        project = params.project
+        project = params.get('project')
 
         if (!project) {
-            steps.error "project is required"
+            script.error "project is required"
         }
 
-        image = "${registryUrl}/${steps.env.repo}/${project}:${tag}"
+        image = "${registryUrl}/${script.env.repo}/${project}:${tag}"
 
-        steps.ansiColor('xterm') {
-            steps.echo "\u001B[1;35m🔧 Building project with Kaniko: ${project} \u001B[0m"
+        script.ansiColor('xterm') {
+            script.echo "\u001B[1;35m🔧 Building project with Kaniko: ${project} \u001B[0m"
         }
 
         try {
-            steps.sh """
+            script.sh """
                 /kaniko/executor \
                 --dockerfile=${path}/${dockerfile} \
                 --context=${path} \
@@ -83,20 +90,20 @@ class Kaniko implements Serializable {
                 --cleanup
             """
         } catch (Exception e) {
-            steps.error "Kaniko build failed: ${e.message}"
+            script.error "Kaniko build failed: ${e.message}"
         }
 
-        steps.currentBuild.description = "Image tag: ${tag}"
+        script.currentBuild.description = "Image tag: ${tag}"
 
         def imageInfo = [
             project: project,
             image: image
         ]
-        steps.writeJSON file: "${project}-image.json", json: imageInfo
-        steps.archiveArtifacts artifacts: "${project}-image.json"
+        script.writeJSON file: "${project}-image.json", json: imageInfo
+        script.archiveArtifacts artifacts: "${project}-image.json"
 
-        steps.ansiColor('xterm') {
-            steps.echo "\u001B[1;32m📦 Image is: ${image}\u001B[m"
+        script.ansiColor('xterm') {
+            script.echo "\u001B[1;32m📦 Image is: ${image}\u001B[m"
         }
 
         return this
