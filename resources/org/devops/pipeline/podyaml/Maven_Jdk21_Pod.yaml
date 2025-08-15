@@ -6,13 +6,13 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:latest-jdk17
+    image: jenkins/inbound-agent:alpine-jdk21
     imagePullPolicy: IfNotPresent
   - name: maven
     image: maven:3.9-eclipse-temurin-21-alpine
     imagePullPolicy: IfNotPresent
     command:
-    - cat
+      - cat
     env:
       - name: MAVEN_OPTS
         value: '-Xmx2g'
@@ -24,25 +24,33 @@ spec:
         cpu: 1000m
         memory: 2000Mi
     volumeMounts:
-    - mountPath: /usr/local/maven/repository
-      name: jenkins-maven
+      - mountPath: /usr/local/maven/repository
+        name: jenkins-maven
     tty: true
-  - name: docker
-    image: docker:dind
+  - name: buildah
+    image: quay.io/buildah/stable:latest
     imagePullPolicy: IfNotPresent
     command:
-    - cat
-    env:
-      - name: DOCKER_BUILDKIT
-        value: 0
-    volumeMounts:
-    - mountPath: /var/run/docker.sock
-      name: dockersock
+      - cat
     tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
+  - name: kubectl
+    image: bitnami/kubectl:1.26.15
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      runAsUser: 1000
   volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf
     - name: jenkins-maven
       persistentVolumeClaim:
         claimName: jenkins-maven
