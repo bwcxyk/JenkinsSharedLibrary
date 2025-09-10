@@ -81,9 +81,7 @@ class Buildah implements Serializable {
 
         try {
             // 使用 Buildah bud 命令构建镜像
-            script.sh """
-                buildah bud --format=docker --file=${context}/${dockerfile} --tag=${image} ${context}
-            """
+            script.sh "buildah bud --format=docker --file=${context}/${dockerfile} --tag=${image} ${context}"
         } catch (Exception e) {
             script.error "Buildah build failed: ${e.message}"
         }
@@ -102,9 +100,7 @@ class Buildah implements Serializable {
                                                       usernameVariable: 'USERNAME',
                                                       passwordVariable: 'PASSWORD')]) {
             try {
-                script.sh """
-                    buildah login -u \$USERNAME -p \$PASSWORD ${registryUrl}
-                """
+                script.sh "buildah login -u \$USERNAME -p \$PASSWORD ${registryUrl}"
                 script.echo "✅ Buildah login successful."
                 isLogin = true
             } catch (Exception e) {
