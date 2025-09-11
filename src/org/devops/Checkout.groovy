@@ -1,12 +1,18 @@
 package org.devops
 
 class Checkout implements Serializable {
+    def script  // 保存 pipeline 上下文
+
+    Checkout(script) {
+        this.script = script
+    }
+
     def call(){
-        checkout scm
+        script.checkout script.scm
     }
     
     def checkoutCustom(){
-        checkout([
+        script.checkout([
             $class: 'GitSCM',
             branches: scm.branches,
             doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
@@ -21,9 +27,9 @@ class Checkout implements Serializable {
     }
 
     def printNodeInfo(){
-        echo "===== Jenkins Info ====="
-        echo "Jenkins Node Name: ${env.K8S_NODE_NAME}"  // 节点名称
-        echo "Jenkins Node IP: ${env.K8S_NODE_IP}"      // 节点 IP
-        echo "=============================="
+        script.echo "===== Jenkins Info ====="
+        script.echo "Jenkins Node Name: ${env.K8S_NODE_NAME}"  // 节点名称
+        script.echo "Jenkins Node IP: ${env.K8S_NODE_IP}"      // 节点 IP
+        script.echo "=============================="
     }
 }
