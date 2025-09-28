@@ -119,7 +119,6 @@ class Buildah implements Serializable {
 
         try {
             script.sh "buildah push ${image}"
-            script.currentBuild.description = "Image tag: ${tag}"
 
             def imageInfo = [
                 project: project,
@@ -131,19 +130,19 @@ class Buildah implements Serializable {
             script.ansiColor('xterm') {
                 script.echo "\u001B[1;32m📦 Image pushed: ${image}\u001B[0m"
             }
+
+            def oldDesc = script.currentBuild.description ?: ""
+            def newEntry = "Project: ${project}, Image tag: ${tag}"
+            if (oldDesc) {
+                script.currentBuild.description = oldDesc + "<br>" + newEntry
+            } else {
+                script.currentBuild.description = newEntry
+            }
+
         } catch (Exception e) {
             script.error "Buildah push failed: ${e.message}"
         }
 
-        return this
-    }
-
-    def rmi() {
-        try {
-            script.sh "buildah rmi ${image}"
-        } catch (Exception e) {
-            script.echo "Buildah rmi failed: ${e.message}"
-        }
         return this
     }
 }
