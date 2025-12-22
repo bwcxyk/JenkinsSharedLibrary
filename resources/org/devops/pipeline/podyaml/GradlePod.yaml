@@ -8,6 +8,15 @@ spec:
   - name: jnlp
     image: jenkins/inbound-agent:latest-jdk17
     imagePullPolicy: IfNotPresent
+    env:
+      - name: K8S_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: K8S_NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
   - name: gradle
     # image: gradle:4.10.3-jdk8
     image: gradle:6.9.4-jdk8
