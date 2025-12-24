@@ -51,6 +51,9 @@ spec:
   - name: buildah
     image: quay.io/buildah/stable:latest
     imagePullPolicy: IfNotPresent
+    env:
+      - name: LANG
+        value: "C.UTF-8"
     command:
       - cat
     tty: true
