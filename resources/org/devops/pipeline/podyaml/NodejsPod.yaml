@@ -6,9 +6,14 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:latest-jdk17
+    image: jenkins/inbound-agent:latest-jdk21
+    imagePullPolicy: IfNotPresent
+  - name: node
+    image: yaokun/node:20
     imagePullPolicy: IfNotPresent
     env:
+      - name: NODE_OPTIONS
+        value: '--max-old-space-size=3072'
       - name: K8S_NODE_NAME
         valueFrom:
           fieldRef:
@@ -17,19 +22,13 @@ spec:
         valueFrom:
           fieldRef:
             fieldPath: status.hostIP
-  - name: node
-    image: yaokun/node:20
-    imagePullPolicy: IfNotPresent
-    env:
-      - name: NODE_OPTIONS
-        value: '--max-old-space-size=3072'
-    resources: # 资源配额
-      limits:  # 限制资源（上限）
-        cpu: 3000m # CPU限制
-        memory: 4500Mi # 内存限制
-      requests: # 请求资源（下限）
-        cpu: 2000m  # CPU预留
-        memory: 2000Mi  # 内存预留
+    resources:
+      limits:
+        cpu: 3000m
+        memory: 4500Mi
+      requests:
+        cpu: 2000m
+        memory: 2000Mi
     command:
       - cat
     tty: true

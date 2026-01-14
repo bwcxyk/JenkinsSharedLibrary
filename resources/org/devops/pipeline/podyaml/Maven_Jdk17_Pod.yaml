@@ -1,0 +1,64 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jnlp
+  namespace: jenkins
+spec:
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:alpine-jdk21
+    imagePullPolicy: IfNotPresent
+  - name: maven
+    image: maven:3.9.9-eclipse-temurin-17-alpine
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    env:
+      - name: MAVEN_OPTS
+        value: '-Xmx2g'
+      - name: K8S_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: K8S_NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
+    resources:
+      limits:
+        cpu: 2500m
+        memory: 4000Mi
+      requests:
+        cpu: 1000m
+        memory: 2000Mi
+    volumeMounts:
+      - mountPath: /usr/local/maven/repository
+        name: jenkins-maven
+    tty: true
+  - name: buildah
+    image: quay.nju.edu.cn/buildah/stable:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
+  - name: kubectl
+    image: bitnami/kubectl:1.26.15
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true
+    securityContext:
+      runAsUser: 1000
+  volumes:
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf
+    - name: jenkins-maven
+      persistentVolumeClaim:
+        claimName: jenkins-maven

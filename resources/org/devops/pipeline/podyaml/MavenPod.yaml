@@ -10,15 +10,6 @@ spec:
   - name: jnlp
     image: jenkins/inbound-agent:alpine-jdk21
     imagePullPolicy: IfNotPresent
-    env:
-      - name: K8S_NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
-      - name: K8S_NODE_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
   - name: maven
     image: maven:3.9-eclipse-temurin-8-alpine
     imagePullPolicy: IfNotPresent
@@ -27,6 +18,14 @@ spec:
     env:
       - name: MAVEN_OPTS
         value: '-Xmx2g'
+      - name: K8S_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: K8S_NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
     resources:
       limits:
         cpu: 2500m

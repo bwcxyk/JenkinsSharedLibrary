@@ -6,9 +6,13 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:latest-jdk17
+    image: jenkins/inbound-agent:latest-jdk21
     imagePullPolicy: IfNotPresent
+  - name: gradle
+    image: gradle:6.9.4-jdk8
     env:
+      - name: GRADLE_OPTS
+        value: '-Xms512m -Xmx2g'
       - name: K8S_NODE_NAME
         valueFrom:
           fieldRef:
@@ -17,19 +21,13 @@ spec:
         valueFrom:
           fieldRef:
             fieldPath: status.hostIP
-  - name: gradle
-    # image: gradle:4.10.3-jdk8
-    image: gradle:6.9.4-jdk8
-    env:
-      - name: GRADLE_OPTS
-        value: '-Xms512m -Xmx2g'
-    resources: # 资源配额
-      limits:  # 限制资源（上限）
-        cpu: 2000m # CPU限制
-        memory: 4000Mi # 内存限制
-      requests: # 请求资源（下限）
-        cpu: 1500m  # CPU预留
-        memory: 2000Mi  # 内存预留
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4000Mi
+      requests:
+        cpu: 1500m
+        memory: 2000Mi
     imagePullPolicy: IfNotPresent
     volumeMounts:
     - mountPath: /home/gradle/.gradle/caches/modules-2/files-2.1
