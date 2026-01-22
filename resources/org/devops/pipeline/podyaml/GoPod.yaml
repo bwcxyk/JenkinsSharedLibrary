@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:jdk17
+    image: jenkins/inbound-agent:jdk21
     imagePullPolicy: IfNotPresent
   - name: go
     image: golang:1.17
