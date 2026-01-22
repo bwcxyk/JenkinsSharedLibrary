@@ -6,10 +6,10 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:alpine-jdk21
+    image: jenkins/inbound-agent:jdk21
     imagePullPolicy: IfNotPresent
   - name: maven
-    image: maven:3.9-eclipse-temurin-21-alpine
+    image: maven:3.9-eclipse-temurin-21
     imagePullPolicy: IfNotPresent
     command:
       - cat

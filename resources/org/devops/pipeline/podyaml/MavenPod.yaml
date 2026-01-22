@@ -8,10 +8,10 @@ spec:
   #   runAsUser: 0
   containers:
   - name: jnlp
-    image: jenkins/inbound-agent:alpine-jdk21
+    image: jenkins/inbound-agent:jdk21
     imagePullPolicy: IfNotPresent
   - name: maven
-    image: maven:3.9-eclipse-temurin-8-alpine
+    image: maven:3.9-eclipse-temurin-8
     imagePullPolicy: IfNotPresent
     command:
       - cat
@@ -37,37 +37,38 @@ spec:
       - mountPath: /usr/local/maven/repository
         name: jenkins-maven
     tty: true
-  - name: docker
-    image: docker:dind
-    imagePullPolicy: IfNotPresent
-    command:
-      - cat
-    env:
-      - name: DOCKER_BUILDKIT
-        value: '0'
-    volumeMounts:
-      - mountPath: /var/run/docker.sock
-        name: dockersock
-    tty: true
-  - name: kaniko
-    # 使用 debug 镜像是因为 latest 镜像中没有常用的 shell 工具（如 cat）
-    # Jenkins pod 模板默认通过 `cat` 命令保持容器存活，否则构建会失败
-    # image: gcr.io/kaniko-project/executor:latest
-    image: gcr.m.daocloud.io/kaniko-project/executor:debug
-    imagePullPolicy: IfNotPresent
-    command:
-      - cat
-    env:
-      - name: KANIKO_REGISTRY_MAP
-        value: index.docker.io=docker.m.daocloud.io
-    tty: true
-    volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker/config.json
-        subPath: .dockerconfigjson
-        readOnly: true
+  # - name: docker
+  #   image: docker:dind
+  #   imagePullPolicy: IfNotPresent
+  #   command:
+  #     - cat
+  #   env:
+  #     - name: DOCKER_BUILDKIT
+  #       value: '0'
+  #   volumeMounts:
+  #     - mountPath: /var/run/docker.sock
+  #       name: dockersock
+  #   tty: true
+  # - name: kaniko
+  #   # 使用 debug 镜像是因为 latest 镜像中没有常用的 shell 工具（如 cat）
+  #   # Jenkins pod 模板默认通过 `cat` 命令保持容器存活，否则构建会失败
+  #   # image: gcr.io/kaniko-project/executor:latest
+  #   image: gcr.m.daocloud.io/kaniko-project/executor:debug
+  #   imagePullPolicy: IfNotPresent
+  #   command:
+  #     - cat
+  #   env:
+  #     - name: KANIKO_REGISTRY_MAP
+  #       value: index.docker.io=docker.m.daocloud.io
+  #   tty: true
+  #   volumeMounts:
+  #     - name: kaniko-secret
+  #       mountPath: /kaniko/.docker/config.json
+  #       subPath: .dockerconfigjson
+  #       readOnly: true
   - name: buildah
-    image: quay.io/buildah/stable:latest
+    # image: quay.io/buildah/stable:latest
+    image: quay.nju.edu.cn/buildah/stable:latest
     imagePullPolicy: IfNotPresent
     env:
       - name: LANG
@@ -90,12 +91,12 @@ spec:
     securityContext:
       runAsUser: 1000
   volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
-    - name: kaniko-secret
-      secret:
-        secretName: regcred
+    # - name: dockersock
+    #   hostPath:
+    #     path: /var/run/docker.sock
+    # - name: kaniko-secret
+    #   secret:
+    #     secretName: regcred
     - name: registries-conf
       configMap:
         name: buildah-registries-conf
