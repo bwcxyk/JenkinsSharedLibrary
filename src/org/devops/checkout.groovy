@@ -22,8 +22,18 @@ def checkoutCustom(){
 }
 
 def printNodeInfo(){
+    def nodeName = sh(
+        script: 'set +x; printf "%s" "$K8S_NODE_NAME"',
+        returnStdout: true
+    ).trim()
+
+    def nodeIp = sh(
+        script: 'set +x; printf "%s" "$K8S_NODE_IP"',
+        returnStdout: true
+    ).trim()
+
     echo "===== Jenkins Info ====="
-    echo "Jenkins Node Name: ${env.K8S_NODE_NAME}"  // 节点名称
-    echo "Jenkins Node IP: ${env.K8S_NODE_IP}"      // 节点 IP
+    echo "Jenkins Node Name: ${nodeName}"   // 节点名称
+    echo "Jenkins Node IP: ${nodeIp}"       // 节点 IP
     echo "=============================="
 }
