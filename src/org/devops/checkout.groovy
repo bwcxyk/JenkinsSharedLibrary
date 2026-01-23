@@ -13,7 +13,7 @@ def checkoutCustom(){
         doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
         extensions: [
             // 设置 clone 参数
-            [$class: 'CloneOption', depth: 1, noTags: false, shallow: true],
+            [$class: 'CloneOption', depth: 1, noTags: false],
             // 添加 GitLFSPull 插件
             [$class: 'GitLFSPull']
         ],
