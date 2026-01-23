@@ -8,8 +8,17 @@ spec:
   - name: jnlp
     image: jenkins/inbound-agent:jdk21
     imagePullPolicy: IfNotPresent
+    env:
+      - name: K8S_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: K8S_NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
   - name: node
-    image: yaokun/node:20
+    image: yaokun/node:20.20
     imagePullPolicy: IfNotPresent
     env:
       - name: NODE_OPTIONS
