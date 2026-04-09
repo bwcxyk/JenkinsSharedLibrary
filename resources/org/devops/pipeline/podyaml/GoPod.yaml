@@ -4,6 +4,8 @@ metadata:
   name: jnlp
   namespace: jenkins
 spec:
+  # securityContext:
+  #   runAsUser: 0
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:jdk21
@@ -18,27 +20,39 @@ spec:
           fieldRef:
             fieldPath: status.hostIP
   - name: go
-    image: golang:1.21
+    image: golang:1.24
     imagePullPolicy: IfNotPresent
     env:
       - name: GOPROXY
         value: https://goproxy.cn
+      - name: GOPATH
+        value: /go
     command:
     - cat
+    volumeMounts:
+      - mountPath: /go
+        name: go-cache
     tty: true
-  - name: docker
-    image: docker:latest
+  - name: buildah
+    # image: quay.io/buildah/stable:latest
+    image: quay.nju.edu.cn/buildah/stable:latest
     imagePullPolicy: IfNotPresent
     env:
-      - name: DOCKER_BUILDKIT
-        value: 0
-    volumeMounts:
-    - mountPath: /var/run/docker.sock
-      name: dockersock
+      - name: LANG
+        value: "C.UTF-8"
     command:
-    - cat
+      - cat
     tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: registries-conf
+        mountPath: /etc/containers/registries.conf
+        subPath: registries.conf
   volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
+    - name: registries-conf
+      configMap:
+        name: buildah-registries-conf
+    - name: go-cache
+      persistentVolumeClaim:
+        claimName: jenkins-go-cache
