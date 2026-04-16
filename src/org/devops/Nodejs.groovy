@@ -13,7 +13,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    nodejs.install("cnpm").build()
+                    nodejs.install("npm").build()
                 }
             }
         }
@@ -47,17 +47,22 @@ class Nodejs implements Serializable {
     }
     
     def build() {
-        def defaultBuildenv = "prod"
-        def buildEnv = script.params?.BUILD_ENV ?: defaultBuildenv
-    
-        String buildCommand = "npm run build:${buildEnv}"
-        script.echo "Executing: ${buildCommand}"
-    
+        def buildEnv = script.params?.BUILD_ENV
+
+        if (buildEnv) {
+            script.echo "BUILD_ENV detected: ${buildEnv}"
+        } else {
+            script.echo "No BUILD_ENV provided, using default build"
+        }
+
+        String buildCommand = buildEnv ? "npm run build:${buildEnv}" : "npm run build"
+
         def exitCode = script.sh(script: buildCommand, returnStatus: true)
         if (exitCode != 0) {
             script.error "${buildCommand} failed with exit code: ${exitCode}"
         }
-    
-        return this // 支持链式调用
+
+        return this
     }
+
 }
