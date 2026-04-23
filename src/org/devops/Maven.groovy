@@ -13,7 +13,7 @@ pipeline {
         stage ('Example') {
             steps {
                 script {
-                    maven.build(params.BUILD_ARGS ?: '')
+                    maven.mavenPackage(params.BUILD_ARGS ?: '')
                 }
             }
         }
@@ -45,13 +45,13 @@ class Maven implements Serializable {
         }
     }
 
-    def build(String additionalArgs = "") {
+    def mavenPackage(String additionalArgs = "") {
         readSettingsXml()
         def mvnCommand = "mvn -s settings.xml clean package -Dmaven.test.skip=true ${additionalArgs}"
         def exitCode = script.sh(script: mvnCommand, returnStatus: true)
 
         if (exitCode != 0) {
-            script.error "Maven build failed with exit code: $exitCode"
+            script.error "Maven package failed with exit code: $exitCode"
         }
     }
 
