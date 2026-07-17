@@ -1,0 +1,48 @@
+#!groovy
+
+@Library('jenkinslibrary@main') _
+
+// func from shareibrary
+def tools = new org.devops.tools()
+def checkout = new org.devops.checkout()
+def buildah = buildahHelper(this)
+
+// 读取资源文件
+def podYaml = libraryResource 'org/devops/pipeline/podyaml/GoPod.yaml'
+
+// pipeline
+pipeline{
+    agent { node { label "build"}}
+
+    stages{
+
+       stage("checkout") {
+            steps {
+                script{
+                    tools.PrintMes("检出代码","green")
+                    checkout.checkoutCustom()
+                }
+            }
+        }
+
+        stage("Build"){
+            steps{
+                container('golang') {
+                    script{
+                        tools.PrintMes("构建代码","green")
+                        sh '''
+                            go version
+                            go mod download
+                            CGO_ENABLED=0 go build \
+                                -trimpath \
+                                -ldflags="-s -w" \
+                                -o app .
+                        '''
+                    }
+                }
+            }
+        }
+        
+    }
+
+}
