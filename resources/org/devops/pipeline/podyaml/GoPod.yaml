@@ -55,4 +55,4 @@ spec:
         name: buildah-registries-conf
     - name: go-cache
       persistentVolumeClaim:
-        claimName: jenkins-go-cache
+        claimName: go-cache
