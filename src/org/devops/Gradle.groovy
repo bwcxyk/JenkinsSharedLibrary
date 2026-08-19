@@ -30,7 +30,17 @@ class Gradle implements Serializable {
         this.script = script
     }
 
+    /**
+     * 打印 Gradle 版本
+     */
+    private def printGradleVersion() {
+        script.echo "Gradle version:"
+        script.sh 'gradle --version'
+    }
+
     def test(additionalArgs = "") {
+        printGradleVersion()
+
         def gradleCommand = "gradle test ${additionalArgs}"
         def exitCode = script.sh(script: gradleCommand, returnStatus: true)
     
@@ -40,6 +50,8 @@ class Gradle implements Serializable {
     }
     
     def build(additionalArgs = "") {
+        printGradleVersion()
+        
         def gradleCommand = "gradle build -x test ${additionalArgs}"
         def exitCode = script.sh(script: gradleCommand, returnStatus: true)
     
