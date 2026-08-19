@@ -32,7 +32,7 @@ class Nodejs implements Serializable {
 
     def install(pkgManager = "npm", installCmd = "ci") {
         // 打印 Node.js 版本
-        script.echo "=== Checking Node.js version ==="
+        script.echo "Node.js version:"
         script.sh "node -v"
     
         String installCommand = "${pkgManager} ${installCmd}"
@@ -45,7 +45,7 @@ class Nodejs implements Serializable {
     
         return this  // 支持链式调用
     }
-    
+
     def build() {
         def buildEnv = script.params?.BUILD_ENV
 
